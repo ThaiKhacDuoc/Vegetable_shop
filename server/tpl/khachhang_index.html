@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Danh sách người dùng</title>
+</head>
+<body>
+    <h1 align="center">Danh sách Nhân Viên</h1>
+    <table border="1" width="100%">
+        <tr>
+            <th>Họ và Tên</th>
+            <th>Số điện thoại</th>
+            <th>Địa chỉ</th>
+            <th>Ngày Sinh</th>
+            <th>Ghi chú</th>
+            <th><a href="{{ url_for('khachhang_add') }}">Thêm</a></th>
+            <th>Sửa</th>
+            <th>Xóa</th>
+        </tr>
+        {% for khachhang in khachhangs %}
+            <tr>
+                <td>{{ khachhang[1] }}</td>
+                <td>{{ khachhang[2] }}</td>
+                <td>{{ khachhang[3] }}</td>
+                <td>{{ khachhang[4] }}</td>
+                <td>{{ khachhang[7] }}</td>
+                <td></td>
+                <td><a href="{{ url_for('khachhang_update', khachhang_id=khachhang[0]) }}">Sửa</a></td>
+                <td><a href="{{ url_for('khachhang_delete', khachhang_id=khachhang[0]) }}">Xóa</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

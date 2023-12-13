@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CTDH Management</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <h1>CTDH Management System</h1>
+
+    <h2>CTDH List</h2>
+    <ul id="CTDHList"></ul>
+
+    <h2>Add CTDH</h2>
+    <form id="addCTDHForm">
+        <label for="donhangid">donhangid:</label>
+        <input type="text" id="donhangid" name="donhangid"><br><br>
+        
+        <label for="tensanpham">tensanpham:</label>
+        <input type="text" id="tensanpham" name="tensanpham"><br><br>
+        
+        <label for="soluong">soluong:</label>
+        <input type="text" id="soluong" name="soluong"><br><br>
+        
+        <input type="submit" value="Add Danh Muc">
+    </form>
+
+    <script>
+        // Hiển thị danh sách người dùng khi trang được tải
+        $(document).ready(function() {
+            fetchCTDHs();
+        });
+
+        // Lấy danh sách người dùng từ server và hiển thị trên giao diện
+        function fetchCTDHs() {
+            $.ajax({
+                url: '/ctdh_index',
+                type: 'GET',
+                success: function(response) {
+                    displayCTDHs(response.ctdhs);
+                }
+            });
+        }
+
+        // Hiển thị danh sách người dùng
+        function displayCTDHs(ctdhs) {
+            var CTDHList = $('#CTDHList');
+            CTDHList.empty();
+            ctdhs.forEach(function(CTDH) {
+                var listItem = $('<li>');
+                listItem.append($('<div>').text('ChiTietDonHangID: ' + CTDH.ChiTietDonHangID));
+                listItem.append($('<div>').text('DonHangID: ' + CTDH.DonHangID));
+                listItem.append($('<div>').text('SanPhamID: ' + CTDH.SanPhamID));
+                listItem.append($('<div>').text('SoLuong: ' + CTDH.SoLuong));
+                listItem.append($('<div>').text('TenSanPham: ' + CTDH.TenSanPham));
+                listItem.append($('<div>').text('GiaBan: ' + CTDH.GiaBan));
+
+                var deleteItem = $('<button onclick="deleteCTDH(\'' + CTDH.ChiTietDonHangID + '\')">Delete</button>');
+                CTDHList.append(listItem);
+                listItem.append(deleteItem);
+            });
+        }
+
+        // Thêm người dùng mới
+        $('#addCTDHForm').submit(function(event) {
+            event.preventDefault();
+            var formData = {
+                donhangid: $('#donhangid').val(),
+                tensanpham: $('#tensanpham').val(),
+                soluong: $('#soluong').val(),
+            };
+
+            $.ajax({
+                url: '/ctdh_add',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function(response) {
+                    alert(response.message);
+                    fetchCTDHs();
+                }
+            });
+        });
+
+        function deleteCTDH(CTDHID){
+            if(confirm('Check delete CTDH')){
+                $.ajax({
+                    url: '/ctdh_delete/' + CTDHID,
+                    type: 'DELETE',
+                    success: function(response){
+                        alert(response.message);
+                        fetchCTDHs();
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

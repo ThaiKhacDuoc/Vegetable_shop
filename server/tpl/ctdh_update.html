@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chỉnh sửa sản phẩm</title>
+</head>
+<body>
+    <h1>Chỉnh sửa sản phẩm</h1>
+    <form method="POST" action="/ctdh_update/{{ ctdh[0] }}">
+        <label for="donhangid">ID đơn hàng:</label>
+        <select name="donhangid">
+            {% for donhangid in donhangids %}
+                <option value="{{ donhangid[0] }}" {% if donhangid[0] == donhangid_old %} selected {% endif %}>
+                    {{ donhangid[0] }}</option>
+            {% endfor %}
+        </select><br>
+        <label for="tensanpham">Tên sản phẩm:</label>
+        <select name="tensanpham">
+            {% for tensanpham in tensanphams %}
+                <option value="{{ tensanpham[0] }}" {% if tensanpham[0] == tensanpham_old %} selected {% endif %}>
+                    {{ tensanpham[0] }}</option>
+            {% endfor %}
+        </select><br> 
+        
+        <label for="soluong">Số lượng:</label>
+        <input type="int" name="soluong" value="{{ ctdh[3] }}" required><br>
+
+        <label for="submit">Lưu:</label>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>

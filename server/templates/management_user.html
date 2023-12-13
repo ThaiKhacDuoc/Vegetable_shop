@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Management</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <h1>User Management System</h1>
+
+    <h2>Users List</h2>
+    <ul id="userList"></ul>
+
+    <h2>Add User</h2>
+    <form id="addUserForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username"><br><br>
+        
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password"><br><br>
+        
+        <label for="role">Role:</label>
+        <input type="text" id="role" name="role"><br><br>
+        
+        <label for="note">Note:</label>
+        <input type="text" id="note" name="note"><br><br>
+        
+        <input type="submit" value="Add User">
+    </form>
+
+    <!-- Add a div to contain the input fields for updating user information -->
+    <div id="updateUserDiv" style="display: none;">
+        <label for="newUsername">New Username:</label>
+        <input type="text" id="newUsername"><br><br>
+        
+        <label for="newPassword">New Password:</label>
+        <input type="password" id="newPassword"><br><br>
+        
+        <label for="newRole">New Role:</label>
+        <input type="text" id="newRole"><br><br>
+        
+        <label for="newNote">New Note:</label>
+        <input type="text" id="newNote"><br><br>
+        
+        <button onclick="confirmUpdate()">Confirm Update</button>
+    </div>
+
+
+    <script>
+        // Hiển thị danh sách người dùng khi trang được tải
+        $(document).ready(function() {
+            fetchUsers();
+        });
+
+        // Lấy danh sách người dùng từ server và hiển thị trên giao diện
+        function fetchUsers() {
+            $.ajax({
+                url: '/user_index',
+                type: 'GET',
+                success: function(response) {
+                    displayUsers(response.users);
+                }
+            });
+        }
+
+        // Hiển thị danh sách người dùng
+        function displayUsers(users) {
+            var userList = $('#userList');
+            userList.empty();
+            users.forEach(function(user) {
+                var listItem = $('<li>');
+                listItem.append($('<div>').text('ID: ' + user.UserID));
+                listItem.append($('<div>').text('Username: ' + user.Username));
+                listItem.append($('<div>').text('Password: ' + user.Password));
+                listItem.append($('<div>').text('Role: ' + user.Role));
+
+                var updateItem = $('<button onclick="updateUser(\'' + user.UserID + '\')">Update</button>');
+                var deleteItem = $('<button onclick="deleteUser(\'' + user.UserID + '\')">Delete</button>');
+                userList.append(listItem);
+                listItem.append(updateItem);
+                listItem.append(deleteItem);
+            });
+        }
+
+        // Thêm người dùng mới
+        $('#addUserForm').submit(function(event) {
+            event.preventDefault();
+            var formData = {
+                username: $('#username').val(),
+                password: $('#password').val(),
+                role: $('#role').val(),
+                note: $('#note').val()
+            };
+
+            $.ajax({
+                url: '/user_add',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function(response) {
+                    alert(response.message);
+                    fetchUsers();
+                }
+            });
+        });
+        
+        var currentUserID;
+        function updateUser(userID) {
+            currentUserID = userID; // Set the current user ID
+            $('#updateUserDiv').css('display', 'block'); // Show the update user div
+        }
+
+        function confirmUpdate() {
+            var formData = {
+                username: $('#newUsername').val(),
+                password: $('#newPassword').val(),
+                role: $('#newRole').val(),
+                note: $('#newNote').val()
+            };
+
+            var userID = currentUserID; // Retrieve the user ID from the global variable
+
+            if (confirm('Update user?')) {
+                $.ajax({
+                    url: '/user_update/' + userID,
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify(formData),
+                    success: function(response) {
+                        alert(response.message);
+                        fetchUsers();
+                        $('#updateUserDiv').css('display', 'none'); // Hide the update user div after the update
+                    }
+                });
+            }
+        }
+
+        function deleteUser(UserID){
+            if(confirm('Check delete user')){
+                $.ajax({
+                    url: '/user_delete/' + UserID,
+                    type: 'DELETE',
+                    success: function(response){
+                        alert(response.message);
+                        fetchUsers();
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

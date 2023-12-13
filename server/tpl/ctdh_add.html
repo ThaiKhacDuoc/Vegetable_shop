@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Thêm đơn hàng</title>
+</head>
+<body>
+    <h1>Thêm đơn hàng mới</h1>
+    <form method="POST" action="/ctdh_add">
+        <label for="donhangid">ID đơn hàng:</label>
+        <select name="donhangid">
+            {% for donhangid in donhangids %}
+                <option value="{{ donhangid[0] }}">{{ donhangid[0] }}</option>
+            {% endfor %}
+        </select><br>
+        <label for="tensanpham">Tên sản phẩm:</label>
+        <select name="tensanpham"> 
+            {% for tensanpham in tensanphams %}
+                <option value="{{ tensanpham[0] }}">{{ tensanpham[0] }}</option>
+            {% endfor %}
+        </select><br>
+        <label for="soluong">Số lượng:</label>
+        <input type="int" name="soluong" required><br>
+        <input type="submit" value="Thêm">
+    </form>    
+</body>
+</html>

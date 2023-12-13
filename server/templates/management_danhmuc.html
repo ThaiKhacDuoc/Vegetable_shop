@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Khach hang Management</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <h1>Quản lý Danh Muc</h1>
+
+    <h2>Danh sách Danh Muc</h2>
+    <ul id="danhMucList"></ul>
+
+    <h2>Thêm Danh Muc</h2>
+    <form id="addDanhMucForm">
+        <label for="tendanhmuc">ten danh muc:</label>
+        <input type="text" id="tendanhmuc" name="tendanhmuc"><br><br>
+
+        <label for="mota">Mo ta:</label>
+        <input type="text" id="mota" name="mota"><br><br>
+
+        <input type="submit" value="Thêm danh muc">
+    </form>
+
+    <script>
+        $(document).ready(function() {
+            fetchDanhMucs();
+        });
+
+        function fetchDanhMucs(){
+            $.ajax({
+                url: '/danhmuc_index',
+                type: 'GET',
+                success: function(response){
+                    displayDanhMucs(response.danhmucs);
+                }
+            });
+        }   
+
+        function displayDanhMucs(danhmucs) {
+            var danhMucList = $('#danhMucList');
+            danhMucList.empty();
+
+            danhmucs.forEach(function(DanhMuc) {
+                var listItem = $('<li>');
+                listItem.append($('<div>').text('ID: ' + DanhMuc.DanhMucID));
+                listItem.append($('<div>').text('TenDanhMuc: ' + DanhMuc.TenDanhMuc));
+                listItem.append($('<div>').text('MoTa: ' + DanhMuc.MoTa));
+
+                var deleteItem = $('<button onclick="deleteDanhMuc(\'' + DanhMuc.DanhMucID + '\')">Delete</button>');
+                listItem.append(deleteItem);
+
+                danhMucList.append(listItem);
+                danhMucList.append($('<br>')); // Xuống dòng sau mỗi item
+            });
+        }
+
+
+        $('#addDanhMucForm').submit(function(event){
+            event.preventDefault();
+            var formData = {
+                tendanhmuc: $('#tendanhmuc').val(),
+                mota: $('#mota').val(),
+            };
+            $.ajax({
+                url: '/danhmuc_add',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function(response){
+                    alert(response.message);
+                    fetchDanhMucs();
+                }
+            })
+        })
+
+        function deleteDanhMuc(DanhMucID){
+            if(confirm('Check delete Danh Muc')){
+                $.ajax({
+                    url: '/danhmuc_delete/' + DanhMucID,
+                    type: 'DELETE',
+                    success: function(response){
+                        alert(response.message);
+                        fetchDanhMucs();
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

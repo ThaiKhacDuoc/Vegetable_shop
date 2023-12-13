@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SanPham Management</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <h1>San Pham Management System</h1>
+
+    <h2>San Pham List</h2>
+    <ul id="sanPhamList"></ul>
+
+    <h2>Add SanPham</h2>
+    <form id="addSanPhamForm">
+        <label for="tensanpham">tensanpham:</label>
+        <input type="text" id="tensanpham" name="tensanpham"><br><br>
+        
+        <label for="thongtinsanpham">thongtinsanpham:</label>
+        <input type="text" id="thongtinsanpham" name="thongtinsanpham"><br><br>
+        
+        <label for="giaban">giaban:</label>
+        <input type="text" id="giaban" name="giaban"><br><br>
+        
+        <label for="tendanhmuc">tendanhmuc:</label>
+        <input type="text" id="tendanhmuc" name="tendanhmuc"><br><br>
+        
+        <input type="submit" value="Add Danh Muc">
+    </form>
+
+    <script>
+        // Hiển thị danh sách người dùng khi trang được tải
+        $(document).ready(function() {
+            fetchSanPhams();
+        });
+
+        // Lấy danh sách người dùng từ server và hiển thị trên giao diện
+        function fetchSanPhams() {
+            $.ajax({
+                url: '/sanpham_index',
+                type: 'GET',
+                success: function(response) {
+                    displaySanPhams(response.sanphams);
+                }
+            });
+        }
+
+        // Hiển thị danh sách người dùng
+        function displaySanPhams(sanphams) {
+            var sanPhamList = $('#sanPhamList');
+            sanPhamList.empty();
+            sanphams.forEach(function(SanPham) {
+                var listItem = $('<li>');
+                listItem.append($('<div>').text('ID: ' + SanPham.SanPhamID));
+                listItem.append($('<div>').text('TenSanPham: ' + SanPham.TenSanPham));
+                listItem.append($('<div>').text('ThongTinSanPham: ' + SanPham.ThongTinSanPham));
+                listItem.append($('<div>').text('GiaBan: ' + SanPham.GiaBan));
+                listItem.append($('<div>').text('DanhMucID: ' + SanPham.DanhMucID));
+                listItem.append($('<div>').text('TenDanhMuc: ' + SanPham.TenDanhMuc));
+
+                var deleteItem = $('<button onclick="deleteSanPham(\'' + SanPham.SanPhamID + '\')">Delete</button>');
+                sanPhamList.append(listItem);
+                listItem.append(deleteItem);
+            });
+        }
+
+        // Thêm người dùng mới
+        $('#addSanPhamForm').submit(function(event) {
+            event.preventDefault();
+            var formData = {
+                tensanpham: $('#tensanpham').val(),
+                thongtinsanpham: $('#thongtinsanpham').val(),
+                giaban: $('#giaban').val(),
+                tendanhmuc: $('#tendanhmuc').val()
+            };
+
+            $.ajax({
+                url: '/sanpham_add',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function(response) {
+                    alert(response.message);
+                    fetchSanPhams();
+                }
+            });
+        });
+
+        function deleteSanPham(SanPhamID){
+            if(confirm('Check delete SanPham')){
+                $.ajax({
+                    url: '/sanpham_delete/' + SanPhamID,
+                    type: 'DELETE',
+                    success: function(response){
+                        alert(response.message);
+                        fetchSanPhams();
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

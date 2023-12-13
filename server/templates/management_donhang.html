@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DonHang Management</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <h1>DonHang Management System</h1>
+
+    <h2>DonHang List</h2>
+    <ul id="donHangList"></ul>
+
+    <h2>Add DonHang</h2>
+    <form id="addDonHangForm">
+        <label for="tenkhachhang">tenkhachhang:</label>
+        <input type="text" id="tenkhachhang" name="tenkhachhang"><br><br>
+        
+        <label for="tennhanvien">tennhanvien:</label>
+        <input type="text" id="tennhanvien" name="tennhanvien"><br><br>
+        
+        <label for="ngaymua">ngaymua:</label>
+        <input type="text" id="ngaymua" name="ngaymua"><br><br>
+        
+        <label for="soluong">soluong:</label>
+        <input type="text" id="soluong" name="soluong"><br><br>
+        
+        <label for="tongtien">tongtien:</label>
+        <input type="text" id="tongtien" name="tongtien"><br><br>
+        
+        <input type="submit" value="Add Danh Muc">
+    </form>
+
+    <script>
+        // Hiển thị danh sách người dùng khi trang được tải
+        $(document).ready(function() {
+            fetchDonHangs();
+        });
+
+        // Lấy danh sách người dùng từ server và hiển thị trên giao diện
+        function fetchDonHangs() {
+            $.ajax({
+                url: '/donhang_index',
+                type: 'GET',
+                success: function(response) {
+                    displayDonHangs(response.donhangs);
+                }
+            });
+        }
+
+        // Hiển thị danh sách người dùng
+        function displayDonHangs(donhangs) {
+            var donHangList = $('#donHangList');
+            donHangList.empty();
+            donhangs.forEach(function(DonHang) {
+                var listItem = $('<li>');
+                listItem.append($('<div>').text('ID: ' + DonHang.DonHangID));
+                listItem.append($('<div>').text('KhachHangID: ' + DonHang.KhachHangID));
+                listItem.append($('<div>').text('NhanVienID: ' + DonHang.NhanVienID));
+                listItem.append($('<div>').text('NgayMua: ' + DonHang.NgayMua));
+                listItem.append($('<div>').text('SoLuong: ' + DonHang.SoLuong));
+                listItem.append($('<div>').text('TongTien: ' + DonHang.TongTien));
+                listItem.append($('<div>').text('TenKhachHang: ' + DonHang.TenKhachHang));
+                listItem.append($('<div>').text('TenNhanVien: ' + DonHang.TenNhanVien));
+
+                var deleteItem = $('<button onclick="deleteDonHang(\'' + DonHang.DonHangID + '\')">Delete</button>');
+                donHangList.append(listItem);
+                listItem.append(deleteItem);
+            });
+        }
+
+        // Thêm người dùng mới
+        $('#addDonHangForm').submit(function(event) {
+            event.preventDefault();
+            var formData = {
+                tenkhachhang: $('#tenkhachhang').val(),
+                tennhanvien: $('#tennhanvien').val(),
+                ngaymua: $('#ngaymua').val(),
+                soluong: $('#soluong').val(),
+                tongtien: $('#tongtien').val()
+            };
+
+            $.ajax({
+                url: '/donhang_add',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function(response) {
+                    alert(response.message);
+                    fetchDonHangs();
+                }
+            });
+        });
+
+        function deleteDonHang(DonHangID){
+            if(confirm('Check delete DonHang')){
+                $.ajax({
+                    url: '/donhang_delete/' + DonHangID,
+                    type: 'DELETE',
+                    success: function(response){
+                        alert(response.message);
+                        fetchDonHangs();
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
