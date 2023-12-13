@@ -31,23 +31,14 @@
                 data: JSON.stringify(formData),
                 success: function(response) {
                     console.log(response); // In ra phản hồi từ server để kiểm tra định dạng
-
-                    var token = response.token;
+                    var role = response.token;
                     var userID = response.user_id;
-
-                    // Lưu token và ID vào localStorage
-                    localStorage.setItem('token', token);
-                    localStorage.setItem('userID', userID);
-
-                    // Kiểm tra xem token có phải là một chuỗi hay không
-                    var decodedToken = jwt_decode(token);
-                    var role = decodedToken.role;
 
                     // Kiểm tra và điều hướng người dùng dựa trên vai trò từ token
                     if (role === 'admin') {
                         window.location.href = '/admin_manager';
                     } else if (role === 'user') {
-                        window.location.href = '/management_sanpham';
+                        window.location.href = '/user/'+userID;
                     } else {
                         alert('You do not have permission to access this page.');
                     }
@@ -56,6 +47,7 @@
                     alert('Login failed');
                 }
             });
+
 
 
 
