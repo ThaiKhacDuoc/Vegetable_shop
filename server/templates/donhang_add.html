@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Thêm đơn hàng</title>
+</head>
+<body>
+    <h1>Thêm đơn hàng mới</h1>
+    <form method="POST" action="/donhang_add">
+        <label for="tenkhachhang">Tên khách hàng:</label>
+        <select name="tenkhachhang">
+            {% for tenkhachhang in tenkhachhangs %}
+                <option value="{{ tenkhachhang[0] }}">{{ tenkhachhang[0] }}</option>
+            {% endfor %}
+        </select><br>
+        <label for="tennhanvien">Tên nhân viên:</label>
+        <select name="tennhanvien">
+            {% for tennhanvien in tennhanviens %}
+                <option value="{{ tennhanvien[0] }}">{{ tennhanvien[0] }}</option>
+            {% endfor %}
+        </select><br>
+        <label for="ngaymua">Ngày mua:</label>
+        <input type="date" name="ngaymua" required><br>
+        <label for="soluong">Số lượng:</label>
+        <input type="int" name="soluong" required><br>
+        <label for="tongtien">Tổng tiền:</label>
+        <input type="double" name="tongtien" required><br>
+        <input type="submit" value="Thêm">
+    </form>    
+</body>
+</html>

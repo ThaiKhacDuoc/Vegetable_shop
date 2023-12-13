@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chỉnh sửa người dùng</title>
+</head>
+<body>
+    <h1>Chỉnh sửa người dùng</h1>
+    <form method="POST" action="/nhanvien_update/{{ nhanvien[0] }}">
+        <label for="hoten">Họ và Tên:</label>
+        <input type="text" name="hoten" value="{{ nhanvien[1] }}" required><br>
+        <label for="ngaysinh">Ngày Sinh:</label>
+        <input type="date" name="ngaysinh" value="{{ nhanvien[2] }}" required><br>
+        <label for="phone">Số điện thoại:</label>
+        <input type="text" name="phone" value="{{ nhanvien[3] }}" required><br>
+        <label for="diachi">Địa chỉ:</label>
+        <input type="text" name="diachi" value="{{ nhanvien[4] }}" required><br>
+        <label for="gmail">Gmail:</label>
+        <input type="text" name="gmail" value="{{ nhanvien[6] }}" required><br>
+        <label for="ghichu">Ghi chú:</label>
+        <input type="text" name="ghichu" value="{{ nhanvien[7] }}" required><br>
+
+        <label for="submit">Lưu:</label>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>

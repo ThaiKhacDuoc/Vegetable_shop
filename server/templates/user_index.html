@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Danh sách người dùng</title>
+</head>
+<body>
+    <h1 align="center">Danh sách người dùng</h1>
+    <table border="1" width="100%">
+        <tr>
+            <th>Username</th>
+            <th>Password</th>
+            <th>Role</th>
+            <th>Note</th>
+            <th><a href="{{ url_for('user_add') }}">Thêm</a></th>
+            <th>Sửa</th>
+            <th>Xóa</th>
+        </tr>
+        {% for user in users %}
+            <tr>
+                <td>{{ user[1] }}</td>
+                <td>{{ user[2] }}</td>
+                <td>{{ user[3] }}</td>
+                <td>{{ user[4] }}</td>
+                <td></td>
+                <td><a href="{{ url_for('user_update', user_id=user[0]) }}">Sửa</a></td>
+                <td><a href="{{ url_for('user_delete', user_id=user[0]) }}">Xóa</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

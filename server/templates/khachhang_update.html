@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chỉnh sửa người dùng</title>
+</head>
+<body>
+    <h1>Chỉnh sửa người dùng</h1>
+    <form method="POST" action="/khachhang_update/{{ khachhang[0] }}">
+        <label for="hoten">Họ và Tên:</label>
+        <input type="text" name="hoten" value="{{ khachhang[1] }}" required><br>
+        <label for="phone">Số điện thoại:</label>
+        <input type="text" name="phone" value="{{ khachhang[2] }}" required><br>
+        <label for="diachi">Địa chỉ:</label>
+        <input type="text" name="diachi" value="{{ khachhang[3] }}" required><br>
+        <label for="ngaysinh">Ngày Sinh:</label>
+        <input type="date" name="ngaysinh" value="{{ khachhang[4] }}" required><br>
+        <label for="ghichu">Ghi chú:</label>
+        <input type="text" name="ghichu" value="{{ khachhang[7] }}" required><br>
+
+        <label for="submit">Lưu:</label>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Danh sách đơn hàng</title>
+</head>
+<body>
+    <h1 align="center">Danh sách đơn hàng</h1>
+    <table border="1" width="100%">
+        <tr>
+            <th>Tên Khách Hàng</th>
+            <th>Ngày mua</th>
+            <th>Số lượng</th>
+            <th>Tổng tiền</th>
+            <th><a href="{{ url_for('donhang_add') }}">Thêm</a></th>
+            <th>Sửa</th>
+            <th>Xóa</th>
+        </tr>
+        {% for donhang in donhangs %}
+            <tr>
+                <td>{{ tenkhachhangs[loop.index0] }}</td>
+                <td>{{ donhang[3] }}</td>
+                <td>{{ donhang[4] }}</td>
+                <td>{{ donhang[5] }}</td>
+                <td></td>
+                <td><a href="{{ url_for('donhang_update', donhang_id=donhang[0]) }}">Sửa</a></td>
+                <td><a href="{{ url_for('donhang_delete', donhang_id=donhang[0]) }}">Xóa</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

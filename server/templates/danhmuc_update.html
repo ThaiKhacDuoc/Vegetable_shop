@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chỉnh sửa người dùng</title>
+</head>
+<body>
+    <h1>Chỉnh sửa người dùng</h1>
+    <form method="POST" action="/danhmuc_update/{{ danhmuc[0] }}">
+        <label for="tendanhmuc">Tên danh mục:</label>
+        <input type="text" name="tendanhmuc" value="{{ danhmuc[1] }}" required><br>
+        <label for="mota">Mô tả:</label>
+        <input type="text" name="mota" value="{{ danhmuc[2] }}" required><br>
+
+        <label for="submit">Lưu:</label>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>

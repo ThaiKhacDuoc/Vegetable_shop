@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chỉnh sửa sản phẩm</title>
+</head>
+<body>
+    <h1>Chỉnh sửa sản phẩm</h1>
+    <form method="POST" action="/sanpham_update/{{ sanpham[0] }}">
+        <label for="tensanpham">Tên sản phẩm:</label>
+        <input type="text" name="tensanpham" value="{{ sanpham[1] }}" required><br>
+        <label for="thongtinsanpham">Thông tin sản phẩm:</label>
+        <input type="text" name="thongtinsanpham" value="{{ sanpham[2] }}" required><br>
+        <label for="giaban">Giá bán:</label>
+        <input type="text" name="giaban" value="{{ sanpham[3] }}" required><br>
+        <label for="tendanhmuc">Danh mục sản phẩm:</label>
+        <select name="tendanhmuc">
+            {% for danhmuc in tendanhmuc %}
+                <option value="{{ danhmuc[0] }}">{{ danhmuc[0] }}</option>
+            {% endfor %}
+        </select><br>
+        <label for="submit">Lưu:</label>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>
