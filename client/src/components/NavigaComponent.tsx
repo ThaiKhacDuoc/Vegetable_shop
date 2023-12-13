@@ -37,7 +37,7 @@ export default function NavigaComponent() {
       <Navbar className='bg-white shadow-lg text-black'>
         <NavbarBrand>
           <AcmeLogo />
-          <p className='font-bold text-inherit' onClick={() => router.push(`/home`)}>
+          <p className='font-bold text-inherit cursor-pointer' onClick={() => router.push(`/home`)}>
             Vegetable Shop
           </p>
         </NavbarBrand>
@@ -75,6 +75,7 @@ export default function NavigaComponent() {
                 key='usage_metrics'
                 description='Hiển thị danh sách, thêm, sửa, xóa,...'
                 startContent={icons.activity}
+                onClick={() => router.push(`/quanli_danhmuc`)}
               >
                 Quản lý theo danh mục
               </DropdownItem>
