@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Danh Sách Hình Ảnh</title>
+</head>
+<body>
+    <h1>Danh Sách Hình Ảnh</h1>
+    <ul>
+        {% for image in images %}
+        <li>{{ image[1] }} - <img src="{{ image[2] }}" alt="Hình ảnh"></li>
+        {% endfor %}
+    </ul>
+    <a href="/add_image">Thêm Hình Ảnh</a>
+</body>
+</html>

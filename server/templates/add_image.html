@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Thêm Hình Ảnh</title>
+</head>
+<body>
+    <h1>Thêm Hình Ảnh</h1>
+    <form method="post" action="/add_image" enctype="multipart/form-data">
+        <label for="name">Tên Hình Ảnh:</label>
+        <input type="text" id="name" name="name" required><br><br>
+        <label for="image_path">Chọn Hình Ảnh:</label>
+        <input type="file" id="image_path" name="image_path" accept="image/*" required><br><br>
+        <button type="submit">Thêm</button>
+    </form>
+    <a href="/">Trở về</a>
+</body>
+</html>

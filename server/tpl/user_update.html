@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chỉnh sửa người dùng</title>
+</head>
+<body>
+    <h1>Chỉnh sửa người dùng</h1>
+    <form method="POST" action="/user_update/{{ user[0] }}">
+        <label for="username">Username:</label>
+        <input type="text" name="username" value="{{ user[2] }}" required><br>
+        <label for="password">Password:</label>
+        <input type="text" name="password" value="{{ user[1] }}" required><br>
+        <label for="role">Role:</label>
+        <input type="text" name="role" value="{{ user[3] }}" required><br>
+        <label for="note">Note:</label>
+        <input type="text" name="note" value="{{ user[4] }}" required><br>
+
+        <label for="submit">Lưu:</label>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Danh sách người dùng</title>
+</head>
+<body>
+    <h1 align="center">Danh sách Nhân Viên</h1>
+    <table border="1" width="100%">
+        <tr>
+            <th>Họ và Tên</th>
+            <th>Ngày Sinh</th>
+            <th>Số điện thoại</th>
+            <th>Địa chỉ</th>
+            <th>Gmail</th>
+            <th>Ghi chú</th>
+            <th><a href="{{ url_for('nhanvien_add') }}">Thêm</a></th>
+            <th>Sửa</th>
+            <th>Xóa</th>
+        </tr>
+        {% for nhanvien in nhanviens %}
+            <tr>
+                <td>{{ nhanvien[1] }}</td>
+                <td>{{ nhanvien[2] }}</td>
+                <td>{{ nhanvien[3] }}</td>
+                <td>{{ nhanvien[4] }}</td>
+                <td>{{ nhanvien[6] }}</td>
+                <td>{{ nhanvien[7] }}</td>
+                <td></td>
+                <td><a href="{{ url_for('nhanvien_update', nhanvien_id=nhanvien[0]) }}">Sửa</a></td>
+                <td><a href="{{ url_for('nhanvien_delete', nhanvien_id=nhanvien[0]) }}">Xóa</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

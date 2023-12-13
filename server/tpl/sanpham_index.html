@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Danh sách sản phẩm</title>
+</head>
+<body>
+    <h1 align="center">Danh sách sản phẩm</h1>
+    <table border="1" width="100%">
+        <tr>
+            <th>Tên sản phẩm</th>
+            <th>Thông tin sản phẩm</th>
+            <th>Giá bán</th>
+            <th>Danh mục sản phẩm</th>
+            <th><a href="{{ url_for('sanpham_add') }}">Thêm</a></th>
+            <th>Sửa</th>
+            <th>Xóa</th>
+        </tr>
+        {% for sanpham in sanphams %}
+            <tr>
+                <td>{{ sanpham[1] }}</td>
+                <td>{{ sanpham[2] }}</td>
+                <td>{{ sanpham[3] }}</td>
+                <td>{{ tendanhmuc[loop.index0] }}</td>
+                <td></td>
+                <td><a href="{{ url_for('sanpham_update', sanpham_id=sanpham[0]) }}">Sửa</a></td>
+                <td><a href="{{ url_for('sanpham_delete', sanpham_id=sanpham[0]) }}">Xóa</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

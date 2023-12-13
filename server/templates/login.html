@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login Page</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <h1>Login</h1>
+    <form id="loginForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username"><br><br>
+        
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password"><br><br>
+        
+        <input type="submit" value="Login">
+    </form>
+
+    <script>
+        $('#loginForm').submit(function(event) {
+            event.preventDefault();
+            var formData = {
+                Username: $('#username').val(),
+                Password: $('#password').val()
+            };
+
+            $.ajax({
+                url: '/api/login',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function(response) {
+                    console.log(response); // In ra phản hồi từ server để kiểm tra định dạng
+
+                    var token = response.token;
+                    var userID = response.user_id;
+
+                    // Lưu token và ID vào localStorage
+                    localStorage.setItem('token', token);
+                    localStorage.setItem('userID', userID);
+
+                    // Kiểm tra xem token có phải là một chuỗi hay không
+                    var decodedToken = jwt_decode(token);
+                    var role = decodedToken.role;
+
+                    // Kiểm tra và điều hướng người dùng dựa trên vai trò từ token
+                    if (role === 'admin') {
+                        window.location.href = '/admin_manager';
+                    } else if (role === 'user') {
+                        window.location.href = '/management_sanpham';
+                    } else {
+                        alert('You do not have permission to access this page.');
+                    }
+                },
+                error: function() {
+                    alert('Login failed');
+                }
+            });
+
+
+
+            // $.ajax({
+            //     url: '/api/login',
+            //     type: 'POST',
+            //     contentType: 'application/json',
+            //     data: JSON.stringify(formData),
+            //     success: function(response) {
+            //         if (response.token === 'admin') {
+            //             window.location.href = '/admin_manager';
+            //         }
+            //         else if (response.token === 'user') {
+            //             window.location.href = '/management_sanpham';
+            //         } else {
+            //             alert('You do not have permission to access this page.');
+            //         }
+            //     },
+            //     error: function() {
+            //         alert('Login failed');
+            //     }
+            // });
+        });
+
+    </script>
+</body>
+</html>

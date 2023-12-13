@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dang ky tai khoan khach hang</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <h1>Dang ky tai khoan khach hang</h1>
+
+    <form id="addCustomerForm">
+        <label for="hoten">Họ Tên:</label>
+        <input type="text" id="hoten" name="hoten"><br><br>
+        
+        <label for="ngaysinh">Ngày Sinh:</label>
+        <input type="text" id="ngaysinh" name="ngaysinh"><br><br>
+        
+        <label for="phone">Điện Thoại:</label>
+        <input type="text" id="phone" name="phone"><br><br>
+        
+        <label for="diachi">Địa Chỉ:</label>
+        <input type="text" id="diachi" name="diachi"><br><br>
+        
+        <label for="ghichu">Ghi Chú:</label>
+        <input type="text" id="ghichu" name="ghichu"><br><br>
+
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username"><br><br>
+        
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password"><br><br>
+
+        <input type="submit" value="Thêm Khách Hàng">
+    </form>
+
+    <script>
+        $('#addCustomerForm').submit(function(event) {
+            event.preventDefault();
+            var formData = {
+                hoten: $('#hoten').val(),
+                ngaysinh: $('#ngaysinh').val(),
+                phone: $('#phone').val(),
+                diachi: $('#diachi').val(),
+                ghichu: $('#ghichu').val(),
+                username: $('#username').val(),
+                password: $('#password').val()
+            };
+
+            $.ajax({
+                url: '/register_user',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function(response) {
+                    alert(response.message);
+                    // Reset form after successful addition
+                    $('#addCustomerForm')[0].reset();
+                },
+                error: function(error) {
+                    alert('Error: ' + error.responseJSON.message);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

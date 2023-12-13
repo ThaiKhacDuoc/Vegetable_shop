@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Danh sách người dùng</title>
+</head>
+<body>
+    <h1 align="center">Danh sách người dùng</h1>
+    <table border="1" width="100%">
+        <tr>
+            <th>Tên danh mục</th>
+            <th>Mô tả</th>
+            <th><a href="{{ url_for('danhmuc_add') }}">Thêm</a></th>
+            <th>Sửa</th>
+            <th>Xóa</th>
+        </tr>
+        {% for danhmuc in danhmucs %}
+            <tr>
+                <td>{{ danhmuc[1] }}</td>
+                <td>{{ danhmuc[2] }}</td>
+                <td></td>
+                <td><a href="{{ url_for('danhmuc_update', danhmuc_id=danhmuc[0]) }}">Sửa</a></td>
+                <td><a href="{{ url_for('danhmuc_delete', danhmuc_id=danhmuc[0]) }}">Xóa</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
