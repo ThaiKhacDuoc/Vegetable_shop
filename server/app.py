@@ -119,9 +119,9 @@ def api_login():
         role = user[3] # Lấy vai trò của user từ DB
 
         # Tạo token
-        # token = jwt.encode({'role': role}, app.config['SECRET_KEY'])
+        token = jwt.encode({'role': role}, app.config['SECRET_KEY'])
 
-        return jsonify({'token': role, 'user_id': user_id})
+        return jsonify({'status': 200, 'token': token, 'user_id': user_id})
     else:
         return jsonify({'error': 'Invalid credentials or insufficient permissions'}), 401
 
@@ -437,20 +437,24 @@ def nhanvien_info(nhanvien_id):
 @app.route('/nhanvien_add', methods=['POST'])
 def nhanvien_add():
     data = request.json
-    if 'hoten' in data and 'ngaysinh' in data and 'phone' in data and 'diachi' in data and 'gmail' in data and 'ghichu' in data and 'userid' in data:
+    if 'hoten' in data and 'ngaysinh' in data and 'phone' in data and 'diachi' in data and 'gmail' in data and 'ghichu' in data:
         id = generate_random_nhanvien_id()
         hoten = data['hoten']
         ngaysinh = data['ngaysinh']
         phone = data['phone']
         diachi = data['diachi']
         gmail = data['gmail']
+        username = data['username']
+        password = data['password']
         ghichu = data['ghichu']
-        userid = data['userid']
 
-        
         connection = connect_to_db()
         cursor = connection.cursor()
-        
+
+        userid = generate_random_user_id()
+        cursor.execute('INSERT INTO user (UserID, Username, Password, Role, Note) VALUES (%s, %s, %s, %s, %s)', (userid, username, password, 'admin', ghichu))
+        connection.commit()
+
         cursor.execute('INSERT INTO nhanvien (NhanVienID, HoTen, NgaySinh, Phone, DiaChi, Gmail, GhiChu, UserID) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)', (id, hoten, ngaysinh, phone, diachi, gmail, ghichu, userid))
         connection.commit()
 
@@ -1206,10 +1210,24 @@ def bill_view(donhang_id):
         'TongTien': donhang[5]
     }
 
-    cursor.execute('SELECT ChiTietDonHangID FROM chitietdonhang WHERE DonHangID = %s', (donhang[0],))
-    ctdhsID = cursor.fetchall()
+    cursor.execute('SELECT SanPhamID FROM chitietdonhang WHERE DonHangID = %s', (donhang[0],))
+    sanphamsID = cursor.fetchall()
+    products = []
 
-    donhang_info['ChiTietDonHangID'] = [item[0] for item in ctdhsID]
+    for sanphamID in sanphamsID:
+        cursor.execute('SELECT TenSanPham, GiaBan, DanhMucID FROM sanpham WHERE SanPhamID = %s', (sanphamID,))
+        sp = cursor.fetchone()
+        tensanpham, giaban, danhmucid = sp if sp else (None, None, None)
+
+        cursor.execute('SELECT TenDanhMuc FROM danhmuc WHERE DanhMucID = %s', (danhmucid,))
+        tendanhmuc = cursor.fetchone()[0]
+        products.append({
+            'TenSanPham': tensanpham,
+            'GiaBan': giaban,
+            'TenDanhMuc': tendanhmuc
+        })
+
+    donhang_info['SanPham'] = products
 
     cursor.close()
     connection.close()
