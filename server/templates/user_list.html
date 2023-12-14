@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Information</title>
+</head>
+<body>
+    <h1>User Information</h1>
+    <div id="userInfo">
+        <!-- Dữ liệu người dùng sẽ được hiển thị ở đây -->
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            fetchUsers();
+        });
+
+        function fetchUsers() {
+            $.ajax({
+                url: '/user_info_list',
+                type: 'GET',
+                success: function(response) {
+                    displayUsers(response.users);
+                }
+            });
+        }
+
+        function displayUsers(users) {
+            var userList = $('#userInfo');
+            userList.empty();
+            users.forEach(function(user) {
+                var listItem = $('<div>');
+                listItem.text('ID: ' + user.UserID);
+
+                var viewItem = $('<button onclick="viewUser(\'' + user.UserID + '\')">VIEW</button>');
+                userList.append(listItem);
+                listItem.append(viewItem);
+            });
+        }
+
+        function viewUser(userID) {
+            window.location.href = '/user_info/' + userID;
+        }
+    </script>
+
+</body>
+</html>

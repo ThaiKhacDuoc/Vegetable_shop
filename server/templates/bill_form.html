@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Bill</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Thêm các file CSS và JavaScript cần thiết -->
+</head>
+<body>
+    
+    <!-- Form nhập thông tin khách hàng -->
+    <label for="hoten">Họ Tên:</label>
+    <input type="text" id="hoten" name="hoten"><br><br>
+
+    <label for="ngaysinh">Ngày Sinh (YYYY-MM-DD):</label>
+    <input type="text" id="ngaysinh" name="ngaysinh"><br><br>
+
+    <label for="phone">Số Điện Thoại:</label>
+    <input type="text" id="phone" name="phone"><br><br>
+
+    <label for="diachi">Địa Chỉ:</label>
+    <input type="text" id="diachi" name="diachi"><br><br>
+
+    <label for="ghichu">Ghi Chú:</label>
+    <input type="text" id="ghichu" name="ghichu"><br><br>
+    <!-- Phần thông tin khác... -->
+
+    <label for="ngaymua"> Ngày mua:</label>
+    <input type="text" id="ngaymua" name="ngaymua"><br><br>
+
+    <!-- Danh sách sản phẩm -->
+    <h3>Nhan vien LIST</h3>
+    <select  id="nhanVienSelect"></select>
+
+    <!-- Hiển thị chi tiết đơn hàng -->
+    <div id="sanPhamSelect">
+        
+    </div><br>
+
+    <div id="counterDisplay"></div><br>
+
+    <button type="button" id="taoDonHangButton" style="background-color: rgb(255, 120, 120);">Tạo Đơn Hàng</button>
+
+    <!-- Danh sách sản phẩm -->
+    <h3>SAN PHAM LIST</h3>
+    <ul id="sanPhamList"></ul>
+
+
+
+
+
+    <!-- /////////////////////////////////////////////////////////////////////////////// -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        
+        var counter = 0;
+        var sanPhamIDs = [];
+
+        function addToSanPhamIDs(id) {
+            sanPhamIDs.push(id);
+        }
+        function removeFromSanPhamIDs(id) {
+            sanPhamIDs = sanPhamIDs.filter(item => item !== id);
+        }
+
+        function updateCounterDisplay() {
+                var counterDisplay = $('#counterDisplay');
+                counterDisplay.text('Counter: ' + counter);
+            }
+
+        updateCounterDisplay();
+
+        $(document).ready(function() {
+            fetchSanPhams();
+            fetchNhanViens();
+            
+        });
+
+        // Lấy danh sách người dùng từ server và hiển thị trên giao diện
+        function fetchSanPhams() {
+            $.ajax({
+                url: '/sanpham_index',
+                type: 'GET',
+                success: function(response) {
+                    displaySanPhams(response.sanphams);
+                }
+            });
+        }
+
+        // Hiển thị danh sách người dùng
+        function displaySanPhams(sanphams) {
+            var sanPhamList = $('#sanPhamList');
+            sanPhamList.empty();
+            sanphams.forEach(function(SanPham) {
+                var listItem = $('<li>');
+                listItem.append($('<div>').text('ID: ' + SanPham.SanPhamID));
+                listItem.append($('<div>').text('TenSanPham: ' + SanPham.TenSanPham));
+                listItem.append($('<div>').text('ThongTinSanPham: ' + SanPham.ThongTinSanPham));
+                listItem.append($('<div>').text('GiaBan: ' + SanPham.GiaBan));
+                listItem.append($('<div>').text('DanhMucID: ' + SanPham.DanhMucID));
+                listItem.append($('<div>').text('TenDanhMuc: ' + SanPham.TenDanhMuc));
+
+                var deleteItem = $('<button onclick="selectSanPham(\'' + SanPham.SanPhamID + '\')">Select</button>');
+                sanPhamList.append(listItem);
+                listItem.append(deleteItem);
+            });
+        }
+
+        function fetchNhanViens(){
+            $.ajax({
+                url: '/nhanvien_index',
+                type: 'GET',
+                success: function(response){
+                    displayNhanViens(response.nhanviens);
+                }
+            });
+        }
+
+        function displayNhanViens(nhanviens) {
+            var nhanVienSelect = $('#nhanVienSelect');
+            nhanVienSelect.empty();
+
+            nhanviens.forEach(function(nhanvien) {
+                var option = $('<option>');
+                option.val(nhanvien.NhanVienID); // Giá trị của option là NhanVienID
+                option.text(nhanvien.HoTen); // Text hiển thị là tên nhân viên
+
+                nhanVienSelect.append(option);
+            });
+        }
+
+
+        function selectSanPham(SanPhamID) {
+            if (confirm('Check select SanPham')) {
+                addToSanPhamIDs(SanPhamID);
+
+                $.ajax({
+                    url: '/sanpham_select/' + SanPhamID,
+                    type: 'GET',
+                    success: function(response) {
+                        var sanPhamSelectDiv = $('#sanPhamSelect');
+                        var sanpham = response.sanpham_dict;
+                        var productInfoDiv = $('<div class="product-info">').attr('data-id', sanpham.SanPhamID); // Đây là ID của sản phẩm
+                        productInfoDiv.append('<h3>Thông tin sản phẩm:</h3>');
+                        productInfoDiv.append('<p>ID: ' + sanpham.SanPhamID + '</p>');
+                        productInfoDiv.append('<p>Tên Sản Phẩm: ' + sanpham.TenSanPham + '</p>');
+                        productInfoDiv.append('<p>Thông Tin Sản Phẩm: ' + sanpham.ThongTinSanPham + '</p>');
+                        productInfoDiv.append('<p>Giá Bán: ' + sanpham.GiaBan + '</p>');
+                        productInfoDiv.append('<p>Danh Mục ID: ' + sanpham.DanhMucID + '</p>');
+                        productInfoDiv.append('<p>Tên Danh Mục: ' + sanpham.TenDanhMuc + '</p>');
+                        var deleteButton = $('<button class="delete-btn" data-id="' + sanpham.SanPhamID + '">Delete</button>');
+                        productInfoDiv.append(deleteButton);
+                        sanPhamSelectDiv.append(productInfoDiv); // Thêm thông tin sản phẩm mới vào #sanPhamSelect
+                        // Xử lý sự kiện khi nút Delete được nhấn
+                        deleteButton.on('click', function() {
+                            var productId = $(this).data('id'); // Lấy ID của sản phẩm từ thuộc tính data-id
+                            removeFromSanPhamIDs(productId);
+
+                            $(this).closest('.product-info').remove(); // Xóa thông tin sản phẩm khi nút Delete được nhấn
+                            
+                            counter--;
+                            updateCounterDisplay();
+                        });
+                        counter++;
+                        updateCounterDisplay();
+                    }
+                });
+
+            }
+        }
+
+        var total = 0;
+        function getTotal() {
+            completedRequests = 0; // Đặt lại số lượng yêu cầu đã hoàn thành
+            total = 0; // Đặt lại tổng
+
+            sanPhamIDs.forEach(function(ID) {
+                $.ajax({
+                    url: '/sanpham_value/' + ID,
+                    type: 'GET',
+                    success: function(response) {
+                        total += response.ctdh_info;
+                    },
+                    error: function(xhr, status, error) {
+                        // Xử lý lỗi nếu cần
+                        console.error('Error:', error);
+                    }
+                });
+            });
+        }
+
+        document.getElementById("taoDonHangButton").onclick = function() {
+            taoDonHang();
+        };
+
+        function taoDonHang() {
+            var hoten = document.getElementById("hoten").value;
+            var ngaysinh = document.getElementById("ngaysinh").value;
+            var phone = document.getElementById("phone").value;
+            var diachi = document.getElementById("diachi").value; // Sửa đổi tên biến
+            var ghichu = document.getElementById("ghichu").value; // Sửa đổi tên biến
+            var ngaymua = document.getElementById("ngaymua").value; // Sửa đổi tên biến
+
+            var nhanVienID = $('#nhanVienSelect').val();
+            var spIDs = sanPhamIDs; 
+
+            var formData = {
+                hoten: hoten,
+                ngaysinh: ngaysinh,
+                phone: phone,
+                diachi: diachi, 
+                ghichu: ghichu, 
+                ngaymua: ngaymua, 
+                nhanVienID: nhanVienID,
+                soLuong: counter,
+                sanPhamIDs: spIDs 
+            };
+
+            $.ajax({
+                url: '/bill_add',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function(response){
+                    alert(response.message);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

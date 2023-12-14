@@ -21,6 +21,9 @@
         <label for="giaban">giaban:</label>
         <input type="text" id="giaban" name="giaban"><br><br>
         
+        <label for="image_path">Chọn Hình Ảnh:</label>
+        <input type="file" id="image_path" name="image_path" accept="image/*" required><br><br>
+        
         <label for="tendanhmuc">tendanhmuc:</label>
         <input type="text" id="tendanhmuc" name="tendanhmuc"><br><br>
         
@@ -55,6 +58,16 @@
                 listItem.append($('<div>').text('ThongTinSanPham: ' + SanPham.ThongTinSanPham));
                 listItem.append($('<div>').text('GiaBan: ' + SanPham.GiaBan));
                 listItem.append($('<div>').text('DanhMucID: ' + SanPham.DanhMucID));
+                // Tạo thẻ img và gán đường dẫn hình ảnh vào thuộc tính src
+                var img = $('<img>').attr({
+                    'src': SanPham.HinhAnh, // SanPham.HinhAnh chứa đường dẫn hình ảnh
+                    'alt': 'Hình ảnh',      // Thiết lập thuộc tính alt
+                    })
+                    .css({
+                        'width': '100px',    // Chiều rộng bạn muốn set, ví dụ 100px
+                        'height': 'auto'  // Chiều cao tự động scale theo tỷ lệ
+                    });
+                listItem.append(img); // Thêm thẻ img vào li
                 listItem.append($('<div>').text('TenDanhMuc: ' + SanPham.TenDanhMuc));
 
                 var deleteItem = $('<button onclick="deleteSanPham(\'' + SanPham.SanPhamID + '\')">Delete</button>');
@@ -66,24 +79,29 @@
         // Thêm người dùng mới
         $('#addSanPhamForm').submit(function(event) {
             event.preventDefault();
-            var formData = {
-                tensanpham: $('#tensanpham').val(),
-                thongtinsanpham: $('#thongtinsanpham').val(),
-                giaban: $('#giaban').val(),
-                tendanhmuc: $('#tendanhmuc').val()
-            };
+
+            var formData = new FormData(); // Tạo đối tượng FormData để gửi dữ liệu form và file
+
+            // Thêm dữ liệu từ các trường input vào FormData
+            formData.append('tensanpham', $('#tensanpham').val());
+            formData.append('thongtinsanpham', $('#thongtinsanpham').val());
+            formData.append('giaban', $('#giaban').val());
+            formData.append('image_path', $('#image_path')[0].files[0]); // Lấy file từ input[type="file"]
+            formData.append('tendanhmuc', $('#tendanhmuc').val());
 
             $.ajax({
                 url: '/sanpham_add',
                 type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(formData),
+                data: formData, // Gửi dữ liệu formData
+                processData: false, // Không xử lý dữ liệu
+                contentType: false, // Không thiết lập contentType (để sử dụng multipart/form-data)
                 success: function(response) {
                     alert(response.message);
                     fetchSanPhams();
                 }
             });
         });
+
 
         function deleteSanPham(SanPhamID){
             if(confirm('Check delete SanPham')){

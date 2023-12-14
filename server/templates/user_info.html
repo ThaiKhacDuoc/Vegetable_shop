@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Information</title>
+</head>
+<body>
+    <h1>User Information</h1>
+    <div id="userInfo">
+        <!-- Dữ liệu người dùng sẽ được hiển thị ở đây -->
+    </div>
+
+    <!-- Add a div to contain the input fields for updating user information -->
+    <div id="updateUserDiv" style="display: none;">
+        <label for="newUsername">New Username:</label>
+        <input type="text" id="newUsername"><br><br>
+        
+        <label for="newPassword">New Password:</label>
+        <input type="password" id="newPassword"><br><br>
+        
+        <label for="newRole">New Role:</label>
+        <input type="text" id="newRole"><br><br>
+        
+        <label for="newNote">New Note:</label>
+        <input type="text" id="newNote"><br><br>
+        
+        <button onclick="confirmUpdate()">Confirm Update</button>
+    </div><br>
+
+    <div style="border-top: 3px solid black;"></div>
+
+    <h1>San Pham Management System</h1>
+
+    <h2>San Pham List</h2>
+    <ul id="sanPhamList"></ul>
+
+    
+
+    <!-- ///////////////////////////////////////////////////////////// -->
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            var userId = window.location.pathname.split('/').pop(); // Lấy user_id từ server-side
+            fetchUser(userId);
+        });
+
+        function fetchUser(userId) {
+            $.ajax({
+                url: '/user/' + userId,
+                type: 'GET',
+                success: function(response) {
+                    displayUser(response.user_info);
+                }
+            });
+        }
+
+        function displayUser(user) {
+            var userInfo = $('#userInfo');
+            userInfo.empty();
+
+            var listItem = $('<div>');
+            listItem.append('<p>User ID: ' + user.UserID + '</p>');
+            listItem.append('<p>Username: ' + user.Username + '</p>');
+            listItem.append('<p>Password: ' + user.Password + '</p>');
+            listItem.append('<p>Role: ' + user.Role + '</p>');
+            listItem.append('<p>Note: ' + user.Note + '</p>');
+
+            var updateItem = $('<button onclick="updateUser(\'' + user.UserID + '\')">Update</button>');
+            listItem.append(updateItem);
+            userInfo.append(listItem);
+        }
+
+
+        var currentUserID;
+        function updateUser(userID) {
+            currentUserID = userID; // Set the current user ID
+            $('#updateUserDiv').css('display', 'block'); // Show the update user div
+        }
+
+        function confirmUpdate() {
+            var formData = {
+                username: $('#newUsername').val(),
+                password: $('#newPassword').val(),
+                role: $('#newRole').val(),
+                note: $('#newNote').val()
+            };
+
+            var userID = currentUserID; // Retrieve the user ID from the global variable
+
+            if (confirm('Update user?')) {
+                $.ajax({
+                    url: '/user_update/' + userID,
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify(formData),
+                    success: function(response) {
+                        alert(response.message);
+                        fetchUsers();
+                        $('#updateUserDiv').css('display', 'none'); // Hide the update user div after the update
+                    }
+                });
+            }
+        }
+
+    <!-- ///////////////////////////////////////////////////////////// -->
+        // Hiển thị danh san pham dùng khi trang được tải
+        $(document).ready(function() {
+            fetchSanPhams();
+        });
+
+        // Lấy danh sách san pham từ server và hiển thị trên giao diện
+        function fetchSanPhams() {
+            $.ajax({
+                url: '/sanpham_index',
+                type: 'GET',
+                success: function(response) {
+                    displaySanPhams(response.sanphams);
+                }
+            });
+        }
+
+        // Hiển thị danh sách người dùng
+        function displaySanPhams(sanphams) {
+            var sanPhamList = $('#sanPhamList');
+            sanPhamList.empty();
+            sanphams.forEach(function(SanPham) {
+                var listItem = $('<li>');
+                listItem.append($('<div>').text('ID: ' + SanPham.SanPhamID));
+                listItem.append($('<div>').text('TenSanPham: ' + SanPham.TenSanPham));
+                listItem.append($('<div>').text('ThongTinSanPham: ' + SanPham.ThongTinSanPham));
+                listItem.append($('<div>').text('GiaBan: ' + SanPham.GiaBan));
+                listItem.append($('<div>').text('DanhMucID: ' + SanPham.DanhMucID));
+                listItem.append($('<div>').text('TenDanhMuc: ' + SanPham.TenDanhMuc));
+
+                var deleteItem = $('<button onclick="addGioHang(\'' + SanPham.SanPhamID + '\')">Thêm vào giỏ hàng</button>');
+                sanPhamList.append(listItem);
+                listItem.append(deleteItem);
+            });
+        }
+    </script>
+</body>
+</html>
