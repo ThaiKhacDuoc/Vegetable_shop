@@ -15,7 +15,7 @@ app.config['SECRET_KEY'] = 'your_secret_key_here'
 
 app.config['MYSQL_HOST'] = "localhost"
 app.config['MYSQL_USER'] = "root"
-app.config['MYSQL_PASSWORD'] = "123456"
+app.config['MYSQL_PASSWORD'] = ""
 app.config['MYSQL_DB'] = "hk5_python_prj"
 
 # mysql = pymysql.connect(
@@ -67,6 +67,12 @@ def index():
     return render_template('index.html')
 
 
+token = None
+def set_token(new_token):
+    global token
+    token = new_token
+
+    
 # @app.route('/api/login', methods=['POST'])
 # def api_login():
 #     data = request.get_json()
@@ -115,15 +121,17 @@ def api_login():
     connection.close()
 
     if user:
-        user_id = user[0]  # Lấy ID của người dùng từ DB
-        role = user[3]  # Lấy vai trò của người dùng từ DB
+        user_id = user[0] # Lấy ID của user từ DB
+        role = user[3] # Lấy vai trò của user từ DB
 
-    # Tạo token
-        token = jwt.encode({'role': role}, 'your-secret-key', algorithm='HS256')
-
+        # Tạo token
+        # token = jwt.encode({'role': role}, app.config['SECRET_KEY'])
+        token = jwt.encode({'role': role, 'user_id': user_id}, app.config['SECRET_KEY'], algorithm='HS256')
+        set_token(token)
         return jsonify({'status': 200, 'token': token, 'user_id': user_id})
     else:
-        return jsonify({'error': 'Thông tin đăng nhập không hợp lệ hoặc không có đủ quyền'}), 401
+        return jsonify({'error': 'Invalid credentials or insufficient permissions'}), 401
+
 
  
 # Hàm decorator để kiểm tra quyền admin
@@ -434,25 +442,46 @@ def nhanvien_info(nhanvien_id):
     response = {'status': 200, 'nhanvien_info': nhanvien_info}
     return jsonify(response)
 
-@app.route('/get_user_info/<string:user_id>', methods=['GET'])
-def get_user_info(user_id):
-    connection = connect_to_db()
-    cursor = connection.cursor()
+# {
+#   "status": 200,
+#   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJ1c2VyX2lkIjoidXMwMDAwMDEifQ.JRVSgCW1Oq3iRCwmDp4Ec7oBaDXyBZDtjZDx8Yk3P4M",
+#   "user_id": "us000001"
+# }
 
-    cursor.execute('SELECT * FROM nhanvien WHERE UserID=%s', (user_id,))
-    nhanvien = cursor.fetchone()
-    user_info = {
-        'HoTen': nhanvien[1],
-        'NgaySinh': nhanvien[2],
-        'Phone': nhanvien[3],
-        'DiaChi': nhanvien[4],
-        'Gmail': nhanvien[6],
-        'GhiChu': nhanvien[7],
-    }
-    cursor.close()
-    connection.close()
-    response = {'status': 200, 'user_info': user_info}
-    return jsonify(response)
+@app.route('/get_user_info', methods=['GET'])
+def get_user_info():
+    token = request.headers.get('Authorization')  # Lấy token từ header Authorization
+
+    if not token:
+        return jsonify({'error': 'Token is missing'}), 401
+    try:
+        decoded_token = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+        role = decoded_token.get('role')
+        user_id = decoded_token.get('user_id')  
+
+        connection = connect_to_db()
+        cursor = connection.cursor()
+        cursor.execute('SELECT * FROM nhanvien WHERE UserID=%s', (user_id,))
+        nhanvien = cursor.fetchone()
+        user_info = {
+            'HoTen': nhanvien[1],
+            'NgaySinh': nhanvien[2],
+            'Phone': nhanvien[3],
+            'DiaChi': nhanvien[4],
+            'Gmail': nhanvien[6],
+            'GhiChu': nhanvien[7],
+        }
+        cursor.close()
+        connection.close()
+        
+    
+        response = {'status': 200, 'user_info': user_info}
+        return jsonify(response)
+    except jwt.ExpiredSignatureError:
+        return jsonify({'error': 'Token has expired'}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'error': 'Invalid token'}), 401
+
 
 @app.route('/nhanvien_add', methods=['POST'])
 def nhanvien_add():
@@ -1075,6 +1104,9 @@ def donhang_delete(donhang_id):
     connection = connect_to_db()
     cursor = connection.cursor()
 
+    cursor.execute('DELETE FROM chitietdonhang WHERE DonHangID = %s', (donhang_id,))
+    connection.commit()
+    
     cursor.execute('DELETE FROM donhang WHERE DonHangID = %s', (donhang_id,))
     connection.commit()
 
@@ -1300,6 +1332,11 @@ def bill_add():
     connection.close()
 
     return jsonify({'message': 'Người dùng đã được thêm mới thành công', 'status': 200})
+
+
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
