@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Navbar,
   NavbarBrand,
@@ -15,8 +15,6 @@ import {
   Avatar,
 } from "@nextui-org/react";
 import AcmeLogo from "../app/Icon/AcmeLogo";
-import ModelComponent from "@/components/ModelComponent";
-import SearchIcon from "../app/Icon/SearchIcon";
 import {
   ChevronDown,
   Lock,
@@ -27,6 +25,17 @@ import {
   Scale,
 } from "../app/Icon/Icons";
 import { useRouter } from "next/navigation";
+import { deleteCookie, getCookie } from "cookies-next";
+import http from "@/app/utils/http";
+
+interface Info {
+  DiaChi: string;
+  GhiChu: string;
+  Gmail: string;
+  HoTen: string;
+  NgaySinh: string;
+  Phone: string;
+}
 
 export default function NavigaComponent() {
   const icons = {
@@ -42,6 +51,36 @@ export default function NavigaComponent() {
   };
 
   const router = useRouter();
+  const [hoten, setHoten] = useState("");
+
+
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const token = getCookie("token")?.toString();
+        const response = await http.get(
+          `get_user_info`,
+          {
+            headers: {
+              Authorization: `${token}`,
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          setHoten(response.data.user_info.HoTen);
+          console.log(response.data.user_info.HoTen);
+        } else {
+          console.log("Loi he thong");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    }
+
+    fetchData();
+  }, []);
 
   return (
     <>
@@ -104,6 +143,7 @@ export default function NavigaComponent() {
                 key="production_ready"
                 description="Hiển thị danh sách, thêm, sửa, xóa,..."
                 startContent={icons.flash}
+                onClick={() => router.push(`/quanli_donhang`)}
               >
                 Quản lý đơn hàng
               </DropdownItem>
@@ -125,17 +165,16 @@ export default function NavigaComponent() {
               <DropdownMenu aria-label="Profile Actions" variant="flat">
                 <DropdownItem key="profile" className="h-14 gap-2">
                   <p className="font-semibold">Signed in as</p>
-                  <p className="font-semibold">zoey@example.com</p>
+                  <p className="font-semibold">{hoten}</p>
                 </DropdownItem>
-                <DropdownItem key="settings">My Settings</DropdownItem>
-                <DropdownItem key="team_settings">Team Settings</DropdownItem>
-                <DropdownItem key="analytics">Analytics</DropdownItem>
-                <DropdownItem key="system">System</DropdownItem>
-                <DropdownItem key="configurations">Configurations</DropdownItem>
-                <DropdownItem key="help_and_feedback">
-                  Help & Feedback
-                </DropdownItem>
-                <DropdownItem key="logout" color="danger">
+                <DropdownItem
+                  key="logout"
+                  color="danger"
+                  onClick={() => {
+                    deleteCookie("token");
+                    router.push(`/login`);
+                  }}
+                >
                   Log Out
                 </DropdownItem>
               </DropdownMenu>

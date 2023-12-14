@@ -19,12 +19,6 @@ export default function AddHome() {
     useState<SelectChangeValueType | null>(null);
   const router = useRouter();
 
-  const [searchValue, setSearchValue] = useState("");
-  const [password, setPassword] = useState("");
-
-  const [isVisible, setIsVisible] = React.useState(false);
-  const toggleVisibility = () => setIsVisible(!isVisible);
-
 
   const handleAdd = async (input1: string, input2: string) => {
     if (input1 != "" && input2 != "") {
@@ -54,6 +48,7 @@ export default function AddHome() {
     }
   };  
 
+  
 
 
   return (

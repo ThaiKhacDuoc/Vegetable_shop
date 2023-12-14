@@ -9,8 +9,6 @@ import { SlLogin } from "react-icons/sl";
 import LoginForm from "@/components/LoginForm";
 import { hasCookie, setCookie } from "cookies-next";
 
-
-
 export default function Login() {
   const router = useRouter();
 
