@@ -415,6 +415,24 @@ def nhanvien_index():
     response = {'status': 200, 'nhanviens': nhanviens_list}
     return jsonify(response)
 
+@app.route('/nhanvien_info/<string:nhanvien_id>', methods=['GET'])
+def nhanvien_info(nhanvien_id):
+    
+    connection = connect_to_db()
+    cursor = connection.cursor()
+
+    cursor.execute('SELECT HoTen FROM nhanvien WHERE NhanVienID=%s', (nhanvien_id,))
+    hotenNV = cursor.fetchone()
+
+    cursor.close()
+    connection.close()
+
+    nhanvien_info = {
+        'HoTen': hotenNV[0]
+    }
+    
+    response = {'status': 200, 'nhanvien_info': nhanvien_info}
+    return jsonify(response)
 
 @app.route('/nhanvien_add', methods=['POST'])
 def nhanvien_add():
@@ -515,12 +533,35 @@ def khachhang_index():
     response = {'status': 200, 'khachhangs': khachhangs_list}
     return jsonify(response)
 
+@app.route('/khachhang_info/<string:khachhang_id>', methods=['GET'])
+def khachhang_info(khachhang_id):
+    
+    connection = connect_to_db()
+    cursor = connection.cursor()
+
+    cursor.execute('SELECT * FROM khachhang WHERE KhachHangID=%s', (khachhang_id,))
+    khachhang = cursor.fetchone()
+
+    cursor.close()
+    connection.close()
+
+    khachhang_info = {
+        'HoTen': khachhang[1],
+        'Phone': khachhang[2],
+        'DiaChi': khachhang[3],
+        'NgaySinh': khachhang[4],
+        'GhiChu': khachhang[5]
+    }
+    
+    response = {'status': 200, 'khachhang_info': khachhang_info}
+    return jsonify(response)
 
 @app.route('/khachhang_add', methods=['POST'])
 def khachhang_add():
     data = request.json
     if 'hoten' in data and 'ngaysinh' in data and 'phone' in data and 'diachi' in data and 'ghichu' in data and 'userid' in data:
-        id = generate_random_khachhang_id()
+        # id = generate_random_khachhang_id()
+        id = data['id']
         hoten = data['hoten']
         ngaysinh = data['ngaysinh']
         phone = data['phone']
@@ -606,6 +647,29 @@ def danhmuc_index():
     response = {'status': 200, 'danhmucs': danhmucs_list}
     return jsonify(response)
 
+@app.route('/danhmuc_find/<string:danhmuc_id>', methods=['GET'])
+def danhmuc_find(danhmuc_id):
+    
+    connection = connect_to_db()
+    cursor = connection.cursor()
+
+    cursor.execute('SELECT * FROM sanpham WHERE DanhMucID=%s', (danhmuc_id))  
+    sanphams = cursor.fetchall()
+    cursor.close()
+    connection.close()
+
+    # Convert danh sách thành từ điển để jsonify có thể xử lý
+    sanphams_list = []
+    for sanpham in sanphams:
+        sanpham_dict = {
+            'TenSanPham': sanpham[1],
+            'ThongTinSanPham': sanpham[2],
+            'GiaBan': sanpham[3]
+        }
+        sanphams_list.append(sanpham_dict)
+
+    response = {'status': 200, 'sanphams': sanphams_list}
+    return jsonify(response)
 
 @app.route('/danhmuc_add', methods=['POST'])
 def danhmuc_add():
@@ -623,7 +687,7 @@ def danhmuc_add():
         cursor.close()
         connection.close()
 
-        return jsonify({'message': 'Người dùng đã được thêm mới thành công', 'status': 'success'})
+        return jsonify({'message': 'Danh muc đã được thêm mới thành công', 'status': 'success'})
     else:
         return jsonify({'message': 'Missing or invalid data in request', 'status': 'error'})
 
@@ -692,6 +756,47 @@ def sanpham_index():
     response = {'status': 200, 'sanphams': sanphams_list}
     return jsonify(response)
 
+@app.route('/sanpham_select/<string:sanpham_id>', methods=['GET'])
+def sanpham_select(sanpham_id):
+    
+    connection = connect_to_db()
+    cursor = connection.cursor()
+
+    cursor.execute('SELECT * FROM sanpham WHERE SanPhamID=%s', (sanpham_id,))  
+    sanpham = cursor.fetchone()
+
+    cursor.execute('SELECT TenDanhMuc FROM danhmuc WHERE DanhMucID = %s', sanpham[5])
+    ten = cursor.fetchone()
+    sanpham_dict = {
+        'SanPhamID': sanpham[0],
+        'TenSanPham': sanpham[1],
+        'ThongTinSanPham': sanpham[2],
+        'GiaBan': sanpham[3],
+        'DanhMucID': sanpham[5],
+        'TenDanhMuc': ten[0] if ten else None
+    }
+
+    cursor.close()
+    connection.close()
+
+    response = {'status': 200, 'sanpham_dict': sanpham_dict}
+    return jsonify(response)
+
+@app.route('/sanpham_value/<string:sanpham_id>', methods=['GET'])
+def sanpham_value(sanpham_id):
+    
+    connection = connect_to_db()
+    cursor = connection.cursor()
+
+    cursor.execute('SELECT GiaBan FROM sanpham WHERE SanPhamID=%s', (sanpham_id,))  
+    tongtien = cursor.fetchone()
+
+    cursor.close()
+    connection.close()
+
+    response = {'status': 200, 'tongtien': tongtien[0]}
+    return jsonify(response)
+
 @app.route('/sanpham_add', methods=['POST'])
 def sanpham_add():
     data = request.json
@@ -714,7 +819,7 @@ def sanpham_add():
         cursor.close()
         connection.close()
 
-        return jsonify({'message': 'Người dùng đã được thêm mới thành công', 'status': 'success'})
+        return jsonify({'status': 200, 'message': 'Người dùng đã được thêm mới thành công'})
     else:
         return jsonify({'message': 'Missing or invalid data in request', 'status': 'error'})
 
@@ -758,7 +863,7 @@ def sanpham_delete(sanpham_id):
 
 
 # ==============================================================================================
-@app.route('/donhang_index')
+@app.route('/donhang_index', methods=['GET'])
 def donhang_index():
     
     connection = connect_to_db()
@@ -794,34 +899,56 @@ def donhang_index():
     response = {'status': 200, 'donhangs': donhangs_list}
     return jsonify(response)
 
+# @app.route('/donhang_add', methods=['POST'])
+# def donhang_add():
+#     data = request.json
+#     if 'tenkhachhang' in data and 'tennhanvien' in data and 'ngaymua' in data and 'soluong' in data and 'tongtien' in data:     
+#         connection = connect_to_db()
+#         cursor = connection.cursor()
+
+#         id = data['id']
+#         tenkhachhang = data['tenkhachhang']
+#         tennhanvien = data['tennhanvien']
+#         ngaymua = data['ngaymua']
+#         soluong = data['soluong']
+#         tongtien = data['tongtien']
+
+#         cursor.execute('SELECT KhachHangID FROM khachhang WHERE HoTen = %s', tenkhachhang)
+#         khachhangid = cursor.fetchone()[0]
+#         cursor.execute('SELECT NhanVienID FROM nhanvien WHERE HoTen = %s', tennhanvien)
+#         nhanvienid = cursor.fetchone()[0]
+
+#         cursor.execute('INSERT INTO donhang (DonHangID, KhachHangID, NhanVienID, NgayMua, SoLuong, TongTien) VALUES (%s, %s, %s, %s, %s, %s)', (id, khachhangid, nhanvienid, ngaymua, soluong, tongtien))
+#         connection.commit()
+
+#         cursor.close()
+#         connection.close()
+    
+#         return jsonify({'message': 'Người dùng đã được thêm mới thành công', 'status': 'success'})
+#     else:
+#         return jsonify({'message': 'Missing or invalid data in request', 'status': 'error'})
 @app.route('/donhang_add', methods=['POST'])
 def donhang_add():
     data = request.json
-    if 'tenkhachhang' in data and 'tennhanvien' in data and 'ngaymua' in data and 'soluong' in data and 'tongtien' in data:     
-        connection = connect_to_db()
-        cursor = connection.cursor()
 
-        id = generate_random_donhang_id()
-        tenkhachhang = data['tenkhachhang']
-        tennhanvien = data['tennhanvien']
-        ngaymua = data['ngaymua']
-        soluong = data['soluong']
-        tongtien = data['tongtien']
+    connection = connect_to_db()
+    cursor = connection.cursor()
 
-        cursor.execute('SELECT KhachHangID FROM khachhang WHERE HoTen = %s', tenkhachhang)
-        khachhangid = cursor.fetchone()[0]
-        cursor.execute('SELECT NhanVienID FROM nhanvien WHERE HoTen = %s', tennhanvien)
-        nhanvienid = cursor.fetchone()[0]
+    id = data['id']
+    khachhangid = data['khachhangid']
+    nhanvienid = data['selectedNhanVienID']
+    soluong = data['soluong']
+    tongtien = data['tongtien']
 
-        cursor.execute('INSERT INTO donhang (DonHangID, KhachHangID, NhanVienID, NgayMua, SoLuong, TongTien) VALUES (%s, %s, %s, %s, %s, %s)', (id, khachhangid, nhanvienid, ngaymua, soluong, tongtien))
-        connection.commit()
+    cursor.execute('INSERT INTO donhang (DonHangID, KhachHangID, NhanVienID, SoLuong, TongTien) VALUES (%s, %s, %s, %s, %s)', (id, khachhangid, nhanvienid, soluong, tongtien))
+    connection.commit()
 
-        cursor.close()
-        connection.close()
-    
-        return jsonify({'message': 'Người dùng đã được thêm mới thành công', 'status': 'success'})
-    else:
-        return jsonify({'message': 'Missing or invalid data in request', 'status': 'error'})
+    cursor.close()
+    connection.close()
+
+    return jsonify({'message': 'Đơn hàng đã được thêm mới thành công', 'status': 'success'})
+
+
 
 @app.route('/donhang_update/<string:donhang_id>', methods=['POST'])
 def donhang_update(donhang_id):
@@ -863,7 +990,7 @@ def donhang_delete(donhang_id):
     return jsonify({'message': 'Người dùng đã được xóa thành công', 'status': 'success'})
 # ==============================================================================================
 
-@app.route('/ctdh_index')
+@app.route('/ctdh_index', methods=['GET'])
 def ctdh_index():
     
     connection = connect_to_db()
@@ -894,6 +1021,36 @@ def ctdh_index():
     response = {'status': 200, 'ctdhs': ctdhs_list}
     return jsonify(response)
 
+@app.route('/ctdh_info/<string:ctdh_id>', methods=['GET'])
+def ctdh_info(ctdh_id):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+
+    cursor.execute('SELECT * FROM chitietdonhang WHERE ChiTietDonHangID=%s', (ctdh_id))
+    ctdh = cursor.fetchone()
+
+    cursor.execute('SELECT TenSanPham, GiaBan, DanhMucID FROM sanpham WHERE SanPhamID = %s', ctdh[2])
+    sp = cursor.fetchone()
+    tensanpham, giaban, danhmucID = sp if sp else (None, None, None)
+
+    cursor.execute('SELECT TenDanhMuc FROM danhmuc WHERE DanhMucID = %s', (danhmucID))
+    tdm = cursor.fetchone()
+    tendanhmuc = tdm if tdm else (None)
+
+    ctdh_info = {
+        'TenSanPham': tensanpham,
+        'GiaBan': giaban,
+        'TenDanhMuc': tendanhmuc[0],
+        'SoLuong': ctdh[3]
+    }
+
+    cursor.close()
+    connection.close()
+
+    response = {'status': 200, 'ctdh_info': ctdh_info}
+    return jsonify(response)
+
+
 @app.route('/ctdh_add', methods=['POST'])
 def ctdh_add():
     data = request.json
@@ -904,12 +1061,9 @@ def ctdh_add():
         
         id = generate_random_chitietdonhang_id()
         donhangid = data['donhangid']
-        tensanpham = data['tensanpham']
+        sanphamid = data['sanphamid']
         soluong = data['soluong']
-        
-        cursor.execute('SELECT SanPhamID FROM sanpham WHERE TenSanPham = %s', tensanpham)
-        sanphamid = cursor.fetchone()[0]
-        
+   
         cursor.execute('INSERT INTO chitietdonhang (ChiTietDonHangID, DonHangID, SanPhamID, SoLuong) VALUES (%s, %s, %s, %s)', (id, donhangid, sanphamid, soluong))
         connection.commit()
 
@@ -962,81 +1116,83 @@ def ctdh_delete(ctdh_id):
 
 # ==============================================================================================
 
-# @app.route('/giohang_index')
-# def giohang_index():
-#     with mysql.cursor() as cursor:
-#         cursor.execute('SELECT * FROM giohang')
-#         ctdhs = cursor.fetchall()
+@app.route('/bill_list')
+def bill_list():
+    return render_template('bill_list.html')
 
-#         ctdhs_list = []
-#         for ctdh in ctdhs:
-#             cursor.execute('SELECT GioHangID, GiaBan FROM sanpham WHERE SanPhamID = %s', ctdh[2])
-#             sp = cursor.fetchone()
-#             tensanpham, giaban = sp if sp else (None, None)
+@app.route('/bill_view/<string:donhang_id>', methods=['GET'])
+def bill_view(donhang_id):
+    connection = connect_to_db()
+    cursor = connection.cursor()
 
-#             ctdh_dict = {
-#                 'ChiTietDonHangID': ctdh[0],
-#                 'DonHangID': ctdh[1],
-#                 'SanPhamID': ctdh[2],
-#                 'SoLuong': ctdh[3],
-#                 'TenSanPham': tensanpham,
-#                 'GiaBan': giaban
-#             }
-#             ctdhs_list.append(ctdh_dict)
+    cursor.execute('SELECT * FROM donhang WHERE DonHangID=%s', (donhang_id,))
+    donhang = cursor.fetchone()
 
-#         response = {'status': 200, 'ctdhs': ctdhs_list}
-#         return jsonify(response)
+    donhang_info = {
+        'DonHangID': donhang[0],
+        'KhachHangID': donhang[1],
+        'NhanVienID': donhang[2],
+        'NgayMua': donhang[3],
+        'SoLuong': donhang[4],
+        'TongTien': donhang[5]
+    }
 
-# @app.route('/ctdh_add', methods=['POST'])
-# def ctdh_add():
-#     data = request.json
-#     if 'donhangid' in data and 'tensanpham' in data and 'soluong' in data:
-#         with mysql.cursor() as cursor:
-#             id = generate_random_chitietdonhang_id()
-#             donhangid = data['donhangid']
-#             tensanpham = data['tensanpham']
-#             soluong = data['soluong']
-            
-#             cursor.execute('SELECT SanPhamID FROM sanpham WHERE TenSanPham = %s', tensanpham)
-#             sanphamid = cursor.fetchone()[0]
-            
-#             cursor.execute('INSERT INTO chitietdonhang (ChiTietDonHangID, DonHangID, SanPhamID, SoLuong) VALUES (%s, %s, %s, %s)', (id, donhangid, sanphamid, soluong))
-#             mysql.commit()
+    cursor.execute('SELECT ChiTietDonHangID FROM chitietdonhang WHERE DonHangID = %s', (donhang[0],))
+    ctdhsID = cursor.fetchall()
 
-#             return jsonify({'message': 'Người dùng đã được thêm mới thành công', 'status': 'success'})
-#     else:
-#         return jsonify({'message': 'Missing or invalid data in request', 'status': 'error'})
+    donhang_info['ChiTietDonHangID'] = [item[0] for item in ctdhsID]
 
-# @app.route('/ctdh_update/<string:ctdh_id>', methods=['POST'])
-# def ctdh_update(ctdh_id):
-#     data = request.json
-#     if 'donhangid' in data and 'tensanpham' in data and 'soluong' in data:
-#         with mysql.cursor() as cursor:
-#             donhangid = data['donhangid']
-#             tensanpham = data['tensanpham']
-#             soluong = data['soluong']
-            
-#             cursor.execute('SELECT SanPhamID FROM sanpham WHERE TenSanPham = %s', tensanpham)
-#             sanphamid = cursor.fetchone()[0]
+    cursor.close()
+    connection.close()
 
-#             cursor.execute('UPDATE chitietdonhang SET DonHangID = %s, SanPhamID = %s, SoLuong = %s WHERE ChiTietDonHangID = %s', (donhangid, sanphamid, soluong, ctdh_id))
-#             mysql.commit()
-
-#             return jsonify({'message': 'Người dùng đã được chỉnh sửa thành công', 'status': 'success'})
-#     else:
-#         return jsonify({'message': 'Missing or invalid data in request', 'status': 'error'})
-
-# @app.route('/ctdh_delete/<string:ctdh_id>', methods=['DELETE'])
-# def ctdh_delete(ctdh_id):
-#     with mysql.cursor() as cursor:
-#         cursor.execute('DELETE FROM chitietdonhang WHERE ChiTietDonHangID = %s', (ctdh_id,))
-#         mysql.commit()
-    
-#         return jsonify({'message': 'Người dùng đã được xóa thành công', 'status': 'success'})
-
+    response = {'status': 200, 'donhang_info': donhang_info}
+    return jsonify(response)
 
 # ==============================================================================================
+@app.route('/bill_form')
+def bill_form():
+    return render_template('bill_form.html')
 
+
+@app.route('/bill_add', methods=['POST'])
+def bill_add():
+    data = request.json
+    tongtien = 0
+
+    connection = connect_to_db()
+    cursor = connection.cursor()
+    
+    khachhang_id = generate_random_khachhang_id()
+    hoten = data['hoten']
+    ngaysinh = data['ngaysinh']
+    phone = data['phone']
+    diachi = data['diachi']
+    ghichu = data['ghichu']
+    ngaymua = data['ngaymua']
+    nhanVienID = data['nhanVienID']
+    soLuong = data['soLuong']
+    sanPhamIDs = data['sanPhamIDs']
+    for sp_id in sanPhamIDs:
+        cursor.execute('SELECT GiaBan FROM sanpham WHERE SanPhamID=%s', (sp_id,))
+        tongtien += cursor.fetchone()[0]
+
+    
+    cursor.execute('INSERT INTO khachhang (KhachHangID, HoTen, NgaySinh, Phone, DiaChi, GhiChu) VALUES (%s, %s, %s, %s, %s, %s)', (khachhang_id, hoten, ngaysinh, phone, diachi, ghichu))
+    connection.commit()
+    
+    donhang_id = generate_random_donhang_id()
+    cursor.execute('INSERT INTO donhang (DonHangID, KhachHangID, NhanVienID, NgayMua, SoLuong, TongTien) VALUES (%s, %s, %s, %s, %s, %s)', (donhang_id, khachhang_id, nhanVienID, ngaymua, 1, tongtien))
+    connection.commit()
+
+    for sp_id in sanPhamIDs:
+        ctdh_id = generate_random_chitietdonhang_id()
+        cursor.execute('INSERT INTO chitietdonhang (ChiTietDonHangID, DonHangID, SanPhamID, SoLuong) VALUES (%s, %s, %s, %s)', (ctdh_id, donhang_id, sp_id, soLuong))
+        connection.commit() 
+
+    cursor.close()
+    connection.close()
+
+    return jsonify({'message': 'Người dùng đã được thêm mới thành công', 'status': 'success'})
 
 
 
