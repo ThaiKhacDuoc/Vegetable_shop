@@ -19,6 +19,7 @@ import { RiDeleteBin5Line, RiEditBoxLine } from "react-icons/ri";
 import { Nhanvien } from "../types/nhanvien.type";
 import { useRouter } from "next/navigation";
 import { BiPlus } from "react-icons/bi";
+import { TbListDetails } from "react-icons/tb";
 
 interface Danhmuc {
   DanhMucID: string;
@@ -126,6 +127,12 @@ export default function Quanlydanhmuc() {
 
                           <TableCell>
                             <div className="flex flex-row items-center justify-start space-x-4">
+                              <Button isIconOnly color="primary">
+                                <TbListDetails
+                                  size={20}
+                                  onClick={() => router.push(`/view_danhmuc?id=${value.DanhMucID}`)}
+                                />
+                              </Button>
                               <Button isIconOnly color="primary">
                                 <RiEditBoxLine
                                   size={20}
