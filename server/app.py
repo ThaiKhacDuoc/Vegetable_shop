@@ -119,9 +119,9 @@ def api_login():
         role = user[3] # Lấy vai trò của user từ DB
 
         # Tạo token
-        # token = jwt.encode({'role': role}, app.config['SECRET_KEY'])
+        token = jwt.encode({'role': role}, app.config['SECRET_KEY'])
 
-        return jsonify({'token': role, 'user_id': user_id})
+        return jsonify({'status': 200, 'token': token, 'user_id': user_id})
     else:
         return jsonify({'error': 'Invalid credentials or insufficient permissions'}), 401
 
@@ -437,20 +437,24 @@ def nhanvien_info(nhanvien_id):
 @app.route('/nhanvien_add', methods=['POST'])
 def nhanvien_add():
     data = request.json
-    if 'hoten' in data and 'ngaysinh' in data and 'phone' in data and 'diachi' in data and 'gmail' in data and 'ghichu' in data and 'userid' in data:
+    if 'hoten' in data and 'ngaysinh' in data and 'phone' in data and 'diachi' in data and 'gmail' in data and 'ghichu' in data:
         id = generate_random_nhanvien_id()
         hoten = data['hoten']
         ngaysinh = data['ngaysinh']
         phone = data['phone']
         diachi = data['diachi']
         gmail = data['gmail']
+        username = data['username']
+        password = data['password']
         ghichu = data['ghichu']
-        userid = data['userid']
 
-        
         connection = connect_to_db()
         cursor = connection.cursor()
-        
+
+        userid = generate_random_user_id()
+        cursor.execute('INSERT INTO user (UserID, Username, Password, Role, Note) VALUES (%s, %s, %s, %s, %s)', (userid, username, password, 'admin', ghichu))
+        connection.commit()
+
         cursor.execute('INSERT INTO nhanvien (NhanVienID, HoTen, NgaySinh, Phone, DiaChi, Gmail, GhiChu, UserID) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)', (id, hoten, ngaysinh, phone, diachi, gmail, ghichu, userid))
         connection.commit()
 
@@ -745,6 +749,7 @@ def sanpham_index():
             'TenSanPham': sanpham[1],
             'ThongTinSanPham': sanpham[2],
             'GiaBan': sanpham[3],
+            'HinhAnh': sanpham[4],
             'DanhMucID': sanpham[5],
             'TenDanhMuc': ten[0] if ten else None
         }
@@ -799,21 +804,35 @@ def sanpham_value(sanpham_id):
 
 @app.route('/sanpham_add', methods=['POST'])
 def sanpham_add():
-    data = request.json
-    if 'tensanpham' in data and 'thongtinsanpham' in data and 'giaban' in data and 'tendanhmuc' in data:
+    if 'tensanpham' in request.form and 'thongtinsanpham' in request.form and 'giaban' in request.form and 'tendanhmuc' in request.form:
+        tensanpham = request.form['tensanpham']
+        thongtinsanpham = request.form['thongtinsanpham']
+        giaban = request.form['giaban']
+        tendanhmuc = request.form['tendanhmuc']
+
+        # Xử lý file từ FormData
+        if 'image_path' in request.files:
+            file = request.files['image_path']
+            if file.filename != '':
+                image_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+                image_path = image_path.replace('\\', '/')  # Thay đổi dấu gạch chéo ngược thành gạch chéo
+                file.save(image_path)
+            else:
+                return 'No selected file'
+        else:
+            return 'No file part'
+
+        # Thêm sản phẩm vào cơ sở dữ liệu
         connection = connect_to_db()
         cursor = connection.cursor()
 
         id = generate_random_sanpham_id()
-        tensanpham = data['tensanpham']
-        thongtinsanpham = data['thongtinsanpham']
-        giaban = data['giaban']
-        tendanhmuc = data['tendanhmuc']
 
-        cursor.execute('SELECT DanhMucID FROM danhmuc WHERE TenDanhMuc = %s', tendanhmuc)
+        cursor.execute('SELECT DanhMucID FROM danhmuc WHERE TenDanhMuc = %s', (tendanhmuc,))
         danhmucid = cursor.fetchone()[0]
 
-        cursor.execute('INSERT INTO sanpham (SanPhamID, TenSanPham, ThongTinSanPham, GiaBan, DanhMucID) VALUES (%s, %s, %s, %s, %s)', (id, tensanpham, thongtinsanpham, giaban, danhmucid))
+        cursor.execute('INSERT INTO sanpham (SanPhamID, TenSanPham, ThongTinSanPham, GiaBan, Image, DanhMucID) VALUES (%s, %s, %s, %s, %s, %s)',
+                       (id, tensanpham, thongtinsanpham, giaban, image_path, danhmucid))
         connection.commit()
 
         cursor.close()
@@ -860,6 +879,60 @@ def sanpham_delete(sanpham_id):
     connection.close()
     return jsonify({'message': 'Người dùng đã được xóa thành công', 'status': 'success'})
 
+
+# ==============================================================================================
+UPLOAD_FOLDER = 'static/images'  # Đường dẫn thư mục lưu trữ hình ảnh
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+@app.route('/images')
+def images():
+    # Hiển thị danh sách hình ảnh từ cơ sở dữ liệu
+    
+    connection = connect_to_db()
+    cursor = connection.cursor()
+
+    cursor.execute("SELECT * FROM images")
+    images = cursor.fetchall()
+
+    cursor.close()
+    connection.close()
+
+    return render_template('images.html', images=images)
+
+@app.route('/add_image', methods=['GET', 'POST'])
+def add_image():
+
+    if request.method == 'POST':
+        name = request.form.get('name')
+
+        if 'image_path' not in request.files:
+            return 'No file part'
+        
+        file = request.files['image_path']
+
+        # Kiểm tra xem có file nào được chọn không
+        if file.filename == '':
+            return 'No selected file'
+        
+        # Lưu file vào thư mục uploads
+        if file:
+            # Lưu file vào thư mục static/images
+            image_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+            image_path = image_path.replace('\\', '/')  # Thay đổi dấu gạch chéo ngược thành gạch chéo
+            file.save(image_path)
+            
+            # Lưu đường dẫn của hình ảnh vào cơ sở dữ liệu
+            connection = connect_to_db()
+            cursor = connection.cursor()
+
+            cursor.execute("INSERT INTO images (name, image) VALUES (%s, %s)", (name, image_path))
+            connection.commit()
+            cursor.close()
+            connection.close()
+            
+            return redirect(url_for('images'))
+    
+    return render_template('add_image.html')
 
 
 # ==============================================================================================
@@ -1137,10 +1210,24 @@ def bill_view(donhang_id):
         'TongTien': donhang[5]
     }
 
-    cursor.execute('SELECT ChiTietDonHangID FROM chitietdonhang WHERE DonHangID = %s', (donhang[0],))
-    ctdhsID = cursor.fetchall()
+    cursor.execute('SELECT SanPhamID FROM chitietdonhang WHERE DonHangID = %s', (donhang[0],))
+    sanphamsID = cursor.fetchall()
+    products = []
 
-    donhang_info['ChiTietDonHangID'] = [item[0] for item in ctdhsID]
+    for sanphamID in sanphamsID:
+        cursor.execute('SELECT TenSanPham, GiaBan, DanhMucID FROM sanpham WHERE SanPhamID = %s', (sanphamID,))
+        sp = cursor.fetchone()
+        tensanpham, giaban, danhmucid = sp if sp else (None, None, None)
+
+        cursor.execute('SELECT TenDanhMuc FROM danhmuc WHERE DanhMucID = %s', (danhmucid,))
+        tendanhmuc = cursor.fetchone()[0]
+        products.append({
+            'TenSanPham': tensanpham,
+            'GiaBan': giaban,
+            'TenDanhMuc': tendanhmuc
+        })
+
+    donhang_info['SanPham'] = products
 
     cursor.close()
     connection.close()
@@ -1197,58 +1284,7 @@ def bill_add():
 
 
 
-# ==============================================================================================
-UPLOAD_FOLDER = 'static/images'  # Đường dẫn thư mục lưu trữ hình ảnh
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-@app.route('/images')
-def images():
-    # Hiển thị danh sách hình ảnh từ cơ sở dữ liệu
-    
-    connection = connect_to_db()
-    cursor = connection.cursor()
-
-    cursor.execute("SELECT * FROM images")
-    images = cursor.fetchall()
-
-    cursor.close()
-    connection.close()
-
-    return render_template('images.html', images=images)
-
-@app.route('/add_image', methods=['GET', 'POST'])
-def add_image():
-    if request.method == 'POST':
-        name = request.form['name']
-        
-        # Kiểm tra xem có file hình ảnh được gửi lên không
-        if 'image_path' not in request.files:
-            return 'No file part'
-        
-        file = request.files['image_path']
-
-        # Kiểm tra xem có file nào được chọn không
-        if file.filename == '':
-            return 'No selected file'
-        
-        # Lưu file vào thư mục uploads
-        if file:
-            # Lưu file vào thư mục static/images
-            image_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-            file.save(image_path)
-            
-            # Lưu đường dẫn của hình ảnh vào cơ sở dữ liệu
-            connection = connect_to_db()
-            cursor = connection.cursor()
-
-            cursor.execute("INSERT INTO images (name, image) VALUES (%s, %s)", (name, image_path))
-            connection.commit()
-            cursor.close()
-            connection.close()
-            
-            return redirect(url_for('images'))
-    
-    return render_template('add_image.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
