@@ -115,15 +115,15 @@ def api_login():
     connection.close()
 
     if user:
-        user_id = user[0] # Lấy ID của user từ DB
-        role = user[3] # Lấy vai trò của user từ DB
+        user_id = user[0]  # Lấy ID của người dùng từ DB
+        role = user[3]  # Lấy vai trò của người dùng từ DB
 
-        # Tạo token
-        token = jwt.encode({'role': role}, app.config['SECRET_KEY'])
+    # Tạo token
+        token = jwt.encode({'role': role}, 'your-secret-key', algorithm='HS256')
 
         return jsonify({'status': 200, 'token': token, 'user_id': user_id})
     else:
-        return jsonify({'error': 'Invalid credentials or insufficient permissions'}), 401
+        return jsonify({'error': 'Thông tin đăng nhập không hợp lệ hoặc không có đủ quyền'}), 401
 
  
 # Hàm decorator để kiểm tra quyền admin
