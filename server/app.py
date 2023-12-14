@@ -434,6 +434,26 @@ def nhanvien_info(nhanvien_id):
     response = {'status': 200, 'nhanvien_info': nhanvien_info}
     return jsonify(response)
 
+@app.route('/get_user_info/<string:user_id>', methods=['GET'])
+def get_user_info(user_id):
+    connection = connect_to_db()
+    cursor = connection.cursor()
+
+    cursor.execute('SELECT * FROM nhanvien WHERE UserID=%s', (user_id,))
+    nhanvien = cursor.fetchone()
+    user_info = {
+        'HoTen': nhanvien[1],
+        'NgaySinh': nhanvien[2],
+        'Phone': nhanvien[3],
+        'DiaChi': nhanvien[4],
+        'Gmail': nhanvien[6],
+        'GhiChu': nhanvien[7],
+    }
+    cursor.close()
+    connection.close()
+    response = {'status': 200, 'user_info': user_info}
+    return jsonify(response)
+
 @app.route('/nhanvien_add', methods=['POST'])
 def nhanvien_add():
     data = request.json
@@ -461,7 +481,7 @@ def nhanvien_add():
         cursor.close()
         connection.close()
 
-        return jsonify({'message': 'Người dùng đã được thêm mới thành công'})
+        return jsonify({'status': 200, 'message': 'Nhân viên đã được thêm mới thành công'})
     else:
         return jsonify({'message': 'Missing or invalid data in request'})
 
@@ -1268,23 +1288,18 @@ def bill_add():
     connection.commit()
     
     donhang_id = generate_random_donhang_id()
-    cursor.execute('INSERT INTO donhang (DonHangID, KhachHangID, NhanVienID, NgayMua, SoLuong, TongTien) VALUES (%s, %s, %s, %s, %s, %s)', (donhang_id, khachhang_id, nhanVienID, ngaymua, 1, tongtien))
+    cursor.execute('INSERT INTO donhang (DonHangID, KhachHangID, NhanVienID, NgayMua, SoLuong, TongTien) VALUES (%s, %s, %s, %s, %s, %s)', (donhang_id, khachhang_id, nhanVienID, ngaymua, soLuong, tongtien))
     connection.commit()
 
     for sp_id in sanPhamIDs:
         ctdh_id = generate_random_chitietdonhang_id()
-        cursor.execute('INSERT INTO chitietdonhang (ChiTietDonHangID, DonHangID, SanPhamID, SoLuong) VALUES (%s, %s, %s, %s)', (ctdh_id, donhang_id, sp_id, soLuong))
+        cursor.execute('INSERT INTO chitietdonhang (ChiTietDonHangID, DonHangID, SanPhamID, SoLuong) VALUES (%s, %s, %s, %s)', (ctdh_id, donhang_id, sp_id, 1))
         connection.commit() 
 
     cursor.close()
     connection.close()
 
-    return jsonify({'message': 'Người dùng đã được thêm mới thành công', 'status': 'success'})
-
-
-
-
-
+    return jsonify({'message': 'Người dùng đã được thêm mới thành công', 'status': 200})
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -26,12 +26,15 @@
 
         <label for="gmail">Email:</label>
         <input type="text" id="gmail" name="gmail"><br><br>
+        
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username"><br><br>
+        
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password"><br><br>
 
         <label for="ghichu">Ghi Chú:</label>
         <input type="text" id="ghichu" name="ghichu"><br><br>
-
-        <label for="userid">User ID:</label>
-        <input type="text" id="userid" name="userid"><br><br>
 
         <input type="submit" value="Thêm Nhân viên">
     </form>
@@ -108,8 +111,9 @@
                 phone: $('#phone').val(),
                 diachi: $('#diachi').val(),
                 gmail: $('#gmail').val(),
+                username: $('#username').val(),
+                password: $('#password').val(),
                 ghichu: $('#ghichu').val(),
-                userid: $('#userid').val()
             };
             $.ajax({
                 url: '/nhanvien_add',

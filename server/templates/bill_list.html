@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DonHang Management</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <h1>DonHang Management System</h1>
+
+    <h2>DonHang List</h2>
+    <ul id="donHangList"></ul>
+
+    <h2>DonHang Details</h2>
+    <ul id="donHangDetail"></ul>
+
+    <script>
+        // Hiển thị danh sách don hang khi trang được tải
+        $(document).ready(function() {
+            fetchDonHangs();
+        });
+
+        // Lấy danh sách don hang từ server và hiển thị trên giao diện
+        function fetchDonHangs() {
+            $.ajax({
+                url: '/donhang_index',
+                type: 'GET',
+                success: function(response) {
+                    displayDonHangs(response.donhangs);
+                }
+            });
+        }
+
+        // Hiển thị danh sách don hang
+        function displayDonHangs(donhangs) {
+            var donHangList = $('#donHangList');
+            donHangList.empty();
+            donhangs.forEach(function(DonHang) {
+                var listItem = $('<li>');
+                listItem.append($('<div>').text('ID: ' + DonHang.DonHangID));
+                listItem.append($('<div>').text('KhachHangID: ' + DonHang.KhachHangID));
+                listItem.append($('<div>').text('NhanVienID: ' + DonHang.NhanVienID));
+                listItem.append($('<div>').text('NgayMua: ' + DonHang.NgayMua));
+                listItem.append($('<div>').text('SoLuong: ' + DonHang.SoLuong));
+                listItem.append($('<div>').text('TongTien: ' + DonHang.TongTien));
+                listItem.append($('<div>').text('TenKhachHang: ' + DonHang.TenKhachHang));
+                listItem.append($('<div>').text('TenNhanVien: ' + DonHang.TenNhanVien));
+
+                var deleteItem = $('<button onclick="viewDonHang(\'' + DonHang.DonHangID + '\')">Chi Tiet</button>');
+                donHangList.append(listItem);
+                listItem.append(deleteItem);
+            });
+        }
+
+        function viewDonHang(DonHangID){
+            if(confirm('Check view DonHang')){
+                $.ajax({
+                    url: '/bill_view/' + DonHangID,
+                    type: 'GET',
+                    success: function(response){
+                        displayDonHangDetail(response.donhang_info);
+                        // fetchDonHangs();
+                    }
+                });
+            }
+        }
+
+        // Hiển thị danh sách don hang
+        function displayDonHangDetail(donhang_info) {
+            var donHangDetail = $('#donHangDetail');
+            donHangDetail.empty();
+
+            var listItem = $('<li>');
+            listItem.append($('<div>').text('DonHangID: ' + donhang_info.DonHangID));
+
+            $.ajax({
+                url: '/khachhang_info/' + donhang_info.KhachHangID,
+                type: 'GET',
+                success: function(response){
+                    displayKhachHangInfo(response.khachhang_info, listItem);
+                }
+            });
+            $.ajax({
+                url: '/nhanvien_info/' + donhang_info.NhanVienID,
+                type: 'GET',
+                success: function(response){
+                    displayNhanVienInfo(response.nhanvien_info, listItem);
+                }
+            });
+            listItem.append($('<div>').text('NgayMua: ' + donhang_info.NgayMua));
+            listItem.append($('<div>').text('SoLuong: ' + donhang_info.SoLuong));
+            listItem.append($('<div>').text('TongTien: ' + donhang_info.TongTien));
+            
+            var chiTietIDs = donhang_info.ChiTietDonHangID;
+            chiTietIDs.forEach(function(ID) {
+                $.ajax({
+                    url: '/ctdh_info/' + ID,
+                    type: 'GET',
+                    success: function(response) {
+                        displayChiTietDonHangInfo(response.ctdh_info, listItem);
+                    }
+                });
+            });
+
+            donHangDetail.append(listItem);
+        }
+
+        function displayKhachHangInfo(khachhang_info, listItem){
+            listItem.append($('<div>').text('KHACH HANG').css('color', 'blue'));
+            listItem.append($('<div>').text('HoTenKhachHang: ' + khachhang_info.HoTen));
+            listItem.append($('<div>').text('Phone: ' + khachhang_info.Phone));
+            listItem.append($('<div>').text('DiaChi: ' + khachhang_info.DiaChi));
+            listItem.append($('<div>').text('NgaySinh: ' + khachhang_info.NgaySinh));
+            listItem.append($('<div>').text('GhiChu: ' + khachhang_info.GhiChu));
+        }
+        function displayNhanVienInfo(nhanvien_info, listItem){
+            listItem.append($('<div>').text('TEN NHAN VIEN').css('color', 'blue'));
+            listItem.append($('<div>').text('HoTenNhanVien: ' + nhanvien_info.HoTen));
+        }
+        function displayChiTietDonHangInfo(ctdh_info, listItem){
+            listItem.append($('<div>').text('SAN PHAM').css('color', 'blue'));
+            listItem.append($('<div>').text('TenSanPham: ' + ctdh_info.TenSanPham));
+            listItem.append($('<div>').text('GiaBan: ' + ctdh_info.GiaBan));
+            listItem.append($('<div>').text('TenDanhMuc: ' + ctdh_info.TenDanhMuc));
+            listItem.append($('<div>').text('SoLuong: ' + ctdh_info.SoLuong));
+        }
+    </script>
+</body>
+</html>
