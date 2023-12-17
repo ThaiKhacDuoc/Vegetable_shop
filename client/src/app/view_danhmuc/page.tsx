@@ -62,10 +62,10 @@ export default function Quanlydanhmuc() {
 
   const fetchOrders = async () => {
     try {
-      const response = await http.get(`danhmuc_index`);
+      const response = await http.get(`danhmuc_find/${params.get("id")}`);
       if (response.status === 200) {
-        setDanhmuc(response.data.danhmucs);
-        console.log(response.data.danhmucs);
+        setDanhmuc(response.data.sanphams);
+        console.log(response.data.sanphams);
       } else {
         console.log("Loi he thong");
       }
@@ -164,9 +164,10 @@ export default function Quanlydanhmuc() {
                                   )
                                     .then((r) => r.json())
                                     .then((d) => {
-                                      if (d.status === "success") {
+                                      if (d.status === 200) {
                                         alert("Xóa thành công")
                                         fetchOrders()
+
                                       } else 
                                       alert("Xóa thất bại")
                                     });
