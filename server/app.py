@@ -15,7 +15,7 @@ app.config['SECRET_KEY'] = 'your_secret_key_here'
 
 app.config['MYSQL_HOST'] = "localhost"
 app.config['MYSQL_USER'] = "root"
-app.config['MYSQL_PASSWORD'] = "123456"
+app.config['MYSQL_PASSWORD'] = ""
 app.config['MYSQL_DB'] = "hk5_python_prj"
 
 UPLOAD_FOLDER = 'static/images'  # Đường dẫn thư mục lưu trữ hình ảnh
@@ -896,15 +896,14 @@ def sanpham_add():
 
 @app.route('/sanpham_update/<string:sanpham_id>', methods=['POST'])
 def sanpham_update(sanpham_id):
-    data = request.json
-    if 'tensanpham' in data and 'thongtinsanpham' in data and 'giaban' in data and 'tendanhmuc' in data:
+    if 'tensanpham' in request.form and 'thongtinsanpham' in request.form and 'giaban' in request.form and 'tendanhmuc' in request.form:
         connection = connect_to_db()
         cursor = connection.cursor()
 
-        tensanpham = data['tensanpham']
-        thongtinsanpham = data['thongtinsanpham']
-        giaban = data['giaban']
-        tendanhmuc = data['tendanhmuc']
+        tensanpham = request.form['tensanpham']
+        thongtinsanpham = request.form['thongtinsanpham']
+        giaban = request.form['giaban']
+        tendanhmuc = request.form['tendanhmuc']
 
         cursor.execute('SELECT DanhMucID FROM danhmuc WHERE TenDanhMuc = %s', tendanhmuc)
         danhmucid = cursor.fetchone()[0]
@@ -915,7 +914,7 @@ def sanpham_update(sanpham_id):
         cursor.close()
         connection.close()
 
-        return jsonify({'message': 'Người dùng đã được chỉnh sửa thành công', 'status': 'success'})
+        return jsonify({'message': 'Sản phẩm đã được chỉnh sửa thành công', 'status': 200})
     else:
         return jsonify({'message': 'Missing or invalid data in request', 'status': 'error'})
 
@@ -929,7 +928,7 @@ def sanpham_delete(sanpham_id):
 
     cursor.close()
     connection.close()
-    return jsonify({'message': 'Người dùng đã được xóa thành công', 'status': 'success'})
+    return jsonify({'message': 'Người dùng đã được xóa thành công', 'status': 200})
 
 
 # ==============================================================================================
