@@ -72,38 +72,6 @@ export default function BillComponent({ billItems }: BillComponentProps) {
     setSoluong(billItems.length);
   }, [billItems]);
 
-  // useEffect(() => {
-  //   async function fetchData() {
-  //     try {
-  //       const response = await http.get(
-  //         `bill_view/${params.get("id")}`
-  //         // {
-  //         //   headers: {
-  //         //     Authorization: `${token}`,
-  //         //   },
-  //         // }
-  //       );
-
-  //       if (response.status === 200) {
-  //         setIddonhang(response.data.donhang_info.DonHangID);
-  //         setIdkhachhang(response.data.donhang_info.KhachHangID);
-  //         setNgaymua(response.data.donhang_info.NgayMua);
-  //         setIdnhanvien(response.data.donhang_info.NhanVienID);
-  //         setSanphams(response.data.donhang_info.SanPham);
-  //         setSoluong(response.data.donhang_info.SoLuong);
-  //         setTongtien(response.data.donhang_info.TongTien);
-  //         console.log(response.data.donhang_info.SanPham);
-  //       } else {
-  //         console.log("Loi he thong");
-  //       }
-  //     } catch (error) {
-  //       console.error("Error:", error);
-  //     }
-  //   }
-
-  //   fetchData();
-  // }, []);
-
   return (
     <div className="pl-52 rounded-lg drop-shadow-2xl w-1/2 mr-5">
       <Card className="max-w-[340px]">

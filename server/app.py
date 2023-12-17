@@ -15,7 +15,7 @@ app.config['SECRET_KEY'] = 'your_secret_key_here'
 
 app.config['MYSQL_HOST'] = "localhost"
 app.config['MYSQL_USER'] = "root"
-app.config['MYSQL_PASSWORD'] = ""
+app.config['MYSQL_PASSWORD'] = "123456"
 app.config['MYSQL_DB'] = "hk5_python_prj"
 
 UPLOAD_FOLDER = 'static/images'  # Đường dẫn thư mục lưu trữ hình ảnh

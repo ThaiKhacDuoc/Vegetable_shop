@@ -87,6 +87,20 @@ export default function Quanlydanhsach() {
     fetchData();
   }, []);
 
+  const fetchOrders = async () => {
+    try {
+      const response = await http.get(`nhanvien_index`);
+      if (response.status === 200) {
+        setNhanvien(response.data.nhanviens);
+        console.log(response.data.danhmucs);
+      } else {
+        console.log("Loi he thong");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   return (
     <>
       <NavigaComponent />
@@ -171,13 +185,44 @@ export default function Quanlydanhsach() {
                               <Button isIconOnly color="primary">
                                 <RiEditBoxLine
                                   size={20}
-                                  onClick={() => router.push("bo api vao")}
+                                  onClick={() => router.push(`/update_nhanvien?id=${value.NhanVienID}`)}
                                 />
                               </Button>
                               <Button
                                 isIconOnly
                                 color="danger"
-                                onClick={() => {}}
+                                onClick={() => {
+                                  
+                                  const headers: Headers = new Headers();
+                                  headers.append(
+                                    "Accept",
+                                    "application/json"
+                                  );
+                                  headers.append(
+                                    "Content-Type",
+                                    "application/json"
+                                  );
+                                  // headers.append(
+                                  //   "Authorization",
+                                  //   getCookie("token") as string
+                                  // );
+                                  fetch(
+                                    `${process.env.BACKEND_URL}nhanvien_delete/${value.NhanVienID}`,
+                                    {
+                                      method: "DELETE",
+                                      headers: headers,
+                                    
+                                    }
+                                  )
+                                    .then((r) => r.json())
+                                    .then((d) => {
+                                      if (d.message === "Người dùng đã được xóa thành công") {
+                                        alert("Xóa thành công")
+                                        fetchOrders()
+                                      } else 
+                                      alert("Xóa thất bại")
+                                    });
+                                }}
                               >
                                 <RiDeleteBin5Line size={20} />
                               </Button>

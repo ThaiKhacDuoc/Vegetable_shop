@@ -85,12 +85,24 @@ export default function Quanlydanhmuc() {
                   <h5 className="font-bold text-xl">
                     Danh sách thực phẩm trong hệ thống
                   </h5>
+
+                  <div className="flex flex-row items-center justify-end space-x-4 px-4">
+                    <Button
+                      isIconOnly
+                      color="success"
+                      onClick={() => router.push("/add_sanpham")}
+                      className="mb-2"
+                    >
+                      <BiPlus size={25} />
+                    </Button>
+                  </div>
                 </div>
                 <Table aria-label="Example static collection table">
                   <TableHeader>
                     <TableColumn>Tên sản phẩm</TableColumn>
                     <TableColumn>Giá bán</TableColumn>
                     <TableColumn>Thông tin sản phẩm</TableColumn>
+                    <TableColumn>Chức năng</TableColumn>
                   </TableHeader>
                   <TableBody>
                     {danhmucList?.map((value, index) => {
@@ -110,6 +122,55 @@ export default function Quanlydanhmuc() {
                               <span className="font-semibold">
                                 {value.ThongTinSanPham}
                               </span>
+                            </div>
+                          </TableCell>
+
+                          <TableCell>
+                            <div className="flex flex-row items-center justify-start space-x-4">
+                              <Button isIconOnly color="primary">
+                                <RiEditBoxLine
+                                  size={20}
+                                  onClick={() => {}}
+                                />
+                              </Button>
+                              <Button
+                                isIconOnly
+                                color="danger"
+                                onClick={() => {
+                                  
+                                  const headers: Headers = new Headers();
+                                  headers.append(
+                                    "Accept",
+                                    "application/json"
+                                  );
+                                  headers.append(
+                                    "Content-Type",
+                                    "application/json"
+                                  );
+                                  // headers.append(
+                                  //   "Authorization",
+                                  //   getCookie("token") as string
+                                  // );
+                                  fetch(
+                                    `${process.env.BACKEND_URL}sanpham_delete/`,
+                                    {
+                                      method: "DELETE",
+                                      headers: headers,
+                                    
+                                    }
+                                  )
+                                    .then((r) => r.json())
+                                    .then((d) => {
+                                      if (d.status === "success") {
+                                        alert("Xóa thành công")
+                                        fetchOrders()
+                                      } else 
+                                      alert("Xóa thất bại")
+                                    });
+                                }}
+                              >
+                                <RiDeleteBin5Line size={20} />
+                              </Button>
                             </div>
                           </TableCell>
                         </TableRow>

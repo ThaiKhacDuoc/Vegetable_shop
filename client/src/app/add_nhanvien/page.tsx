@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import http from "@/app/utils/http";
@@ -6,6 +6,7 @@ import http from "@/app/utils/http";
 import { MdOutlineDevicesOther } from "react-icons/md";
 import { Tabs, Tab, Card, CardBody, CardHeader } from "@nextui-org/react";
 import FormComponent from "@/components/FormComponent";
+import AddNhanvienComponent from "@/components/AddNhanvienComponent";
 
 interface OptionType {
   value: string;
@@ -15,12 +16,26 @@ interface OptionType {
 type SelectChangeValueType = OptionType | null;
 
 export default function AddNhanvien() {
- 
-  const handleAdd = async (input1: string, input2: string) => {
+  const handleAdd = async (
+    input1: string,
+    input2: string,
+    input3: string,
+    input4: string,
+    input5: string,
+    input6: string,
+    input7: string,
+    input8: string
+  ) => {
     if (input1 != "" && input2 != "") {
       const data = {
-        tendanhmuc :input1,
-        mota :input2,
+        hoten: input1,
+        ngaysinh: input2,
+        phone: input3,
+        diachi: input4,
+        gmail: input5,
+        username: input6,
+        password: input7,
+        ghichu: input8,
       };
       try {
         const response = await http.post("nhanvien_add", data, {
@@ -31,10 +46,9 @@ export default function AddNhanvien() {
         const result = await response.data;
         console.log(result);
         if (result.status == "success") {
-          alert("Thêm thành công")
+          alert("Thêm thành công");
         } else if (result.status != 200) {
-          alert("Thêm thất bại")
-
+          alert("Thêm thất bại");
         }
       } catch (error) {
         console.error("Error:", error);
@@ -57,7 +71,19 @@ export default function AddNhanvien() {
             radius="full"
           >
             <Tab key="nhanvien" title="Nhân viên">
-              <FormComponent titleInput1 = "Tên" titleInput2 = "" handleFunction = {handleAdd} />
+              <AddNhanvienComponent
+                titleInput1="Tên"
+                titleInput2="Ngày sinh"
+                titleInput3="Phone"
+                titleInput4="Địa chỉ"
+                titleInput5="Gmail"
+                titleInput6="Username"
+                titleInput7="Password"
+                titleInput8="Ghi chú"
+                push="/quanli_danhsach"
+                titilebutton = "Add"
+                handleFunction={handleAdd}
+              />
             </Tab>
           </Tabs>
         </div>

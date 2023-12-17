@@ -12,12 +12,10 @@ interface Type {
 }
 
 export default function FormComponent( {titleInput1, titleInput2, handleFunction} : Type) {
-  const [selectedValue, setSelectedValue] = useState<string>("");
   const router = useRouter();
 
   const [input1, setInput1] = useState("");
   const [input2, setInput2] = useState("");
-  const params = useSearchParams();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
