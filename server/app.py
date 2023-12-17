@@ -18,6 +18,8 @@ app.config['MYSQL_USER'] = "root"
 app.config['MYSQL_PASSWORD'] = ""
 app.config['MYSQL_DB'] = "hk5_python_prj"
 
+UPLOAD_FOLDER = 'static/images'  # Đường dẫn thư mục lưu trữ hình ảnh
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # mysql = pymysql.connect(
 #     host=app.config['MYSQL_HOST'],
 #     user=app.config['MYSQL_USER'],
@@ -888,7 +890,7 @@ def sanpham_add():
         cursor.close()
         connection.close()
 
-        return jsonify({'status': 200, 'message': 'Người dùng đã được thêm mới thành công'})
+        return jsonify({'status': 200, 'message': 'Sản phẩm đã được thêm mới thành công'})
     else:
         return jsonify({'message': 'Missing or invalid data in request', 'status': 'error'})
 
@@ -931,8 +933,7 @@ def sanpham_delete(sanpham_id):
 
 
 # ==============================================================================================
-UPLOAD_FOLDER = 'static/images'  # Đường dẫn thư mục lưu trữ hình ảnh
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 
 @app.route('/images')
 def images():
