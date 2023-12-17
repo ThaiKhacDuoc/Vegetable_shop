@@ -24,8 +24,6 @@ Mở trình duyệt và truy cập http://localhost:3000 để xem ứng dụng.
 2. **Chạy server:**
 `python app.py`
 
-markdown
-Copy code
 Server sẽ chạy tại http://localhost:5000.
 
 ## Cấu trúc Thư mục
