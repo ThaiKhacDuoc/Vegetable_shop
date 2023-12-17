@@ -15,7 +15,7 @@ app.config['SECRET_KEY'] = 'your_secret_key_here'
 
 app.config['MYSQL_HOST'] = "localhost"
 app.config['MYSQL_USER'] = "root"
-app.config['MYSQL_PASSWORD'] = "123456"
+app.config['MYSQL_PASSWORD'] = ""
 app.config['MYSQL_DB'] = "hk5_python_prj"
 
 # mysql = pymysql.connect(
@@ -515,7 +515,7 @@ def nhanvien_add():
         return jsonify({'message': 'Missing or invalid data in request'})
 
 
-@app.route('/nhanvien_update/<string:nhanvien_id>', methods=['PUT'])
+@app.route('/nhanvien_update/<string:nhanvien_id>', methods=['POST'])
 def nhanvien_update(nhanvien_id):
     data = request.json
     if 'hoten' in data and 'ngaysinh' in data and 'phone' in data and 'diachi' in data and 'gmail' in data and 'ghichu' in data:
@@ -715,6 +715,7 @@ def danhmuc_find(danhmuc_id):
     sanphams_list = []
     for sanpham in sanphams:
         sanpham_dict = {
+            'SanPhamID': sanpham[0],
             'TenSanPham': sanpham[1],
             'ThongTinSanPham': sanpham[2],
             'GiaBan': sanpham[3]
