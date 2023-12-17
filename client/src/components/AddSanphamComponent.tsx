@@ -10,6 +10,7 @@ interface Type {
   titleInput2: string;
   titleInput3: string;
   titleInput4: string;
+  titlebutton: string;
   handleFunction: (
     input1: string,
     input2: string,
@@ -24,6 +25,7 @@ export default function AddSanphamComponent({
   titleInput2,
   titleInput3,
   titleInput4,
+  titlebutton,
   handleFunction,
 }: Type) {
   const router = useRouter();
@@ -143,7 +145,7 @@ export default function AddSanphamComponent({
             router.push(`/quanli_danhmuc`);
           }}
         >
-          Add
+          {titlebutton}
         </Button>
       </div>
     </>

@@ -25,6 +25,7 @@ interface Danhmuc {
   GiaBan: string;
   TenSanPham: string;
   ThongTinSanPham: string;
+  SanPhamID: string;
 }
 
 export default function Quanlydanhmuc() {
@@ -99,6 +100,7 @@ export default function Quanlydanhmuc() {
                 </div>
                 <Table aria-label="Example static collection table">
                   <TableHeader>
+                    <TableColumn>ID Sản phẩm</TableColumn>
                     <TableColumn>Tên sản phẩm</TableColumn>
                     <TableColumn>Giá bán</TableColumn>
                     <TableColumn>Thông tin sản phẩm</TableColumn>
@@ -108,6 +110,7 @@ export default function Quanlydanhmuc() {
                     {danhmucList?.map((value, index) => {
                       return (
                         <TableRow key={index}>
+                          <TableCell>{value.SanPhamID}</TableCell>
                           <TableCell>{value.TenSanPham}</TableCell>
                           <TableCell>
                             <div className="flex flex-col items-start justify-start">
@@ -130,7 +133,7 @@ export default function Quanlydanhmuc() {
                               <Button isIconOnly color="primary">
                                 <RiEditBoxLine
                                   size={20}
-                                  onClick={() => {}}
+                                  onClick={() => {router.push(`/update_sanpham?id=${value.SanPhamID}`)}}
                                 />
                               </Button>
                               <Button
@@ -152,7 +155,7 @@ export default function Quanlydanhmuc() {
                                   //   getCookie("token") as string
                                   // );
                                   fetch(
-                                    `${process.env.BACKEND_URL}sanpham_delete/`,
+                                    `${process.env.BACKEND_URL}sanpham_delete/${value.SanPhamID}`,
                                     {
                                       method: "DELETE",
                                       headers: headers,

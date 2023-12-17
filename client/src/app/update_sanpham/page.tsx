@@ -1,5 +1,5 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import http from "@/app/utils/http";
 // import { getCookie } from "cookies-next";
@@ -18,6 +18,8 @@ export default function AddHome() {
   const [selectedOption, setSelectedOption] =
     useState<SelectChangeValueType | null>(null);
   const router = useRouter();
+  const params = useSearchParams();
+
 
   const handleAdd = async (
     input1: string,
@@ -35,7 +37,7 @@ export default function AddHome() {
       formData.append("image_path", image);
     }
 
-    const response = await fetch(`${process.env.BACKEND_URL}sanpham_add`, {
+    const response = await fetch(`${process.env.BACKEND_URL}sanpham_update/${params.get("id")}`, {
       method: "POST",
       // headers: { Authorization: `Bearer ${token}` },
       body: formData,
@@ -54,7 +56,7 @@ export default function AddHome() {
       <div className="bg-white p-8 rounded-lg drop-shadow-2xl w-1/3">
         <div className="flex flex-col justify-center items-center gap-1 font-bold h-[desiredHeight] text-lg mb-2.5">
           <MdOutlineDevicesOther className="text-2xl" />
-          Thêm sản phẩm
+          Update sản phẩm
           <Tabs
             key="primary"
             color="primary"
@@ -67,7 +69,7 @@ export default function AddHome() {
                 titleInput2="Thông tin sản phẩm"
                 titleInput3="Giá bán"
                 titleInput4="Tên danh mục"
-                titlebutton = "Add"
+                titlebutton = "Update"
                 handleFunction={handleAdd}
               />
             </Tab>
