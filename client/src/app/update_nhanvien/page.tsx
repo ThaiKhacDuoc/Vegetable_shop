@@ -46,7 +46,7 @@ export default function AddNhanvien() {
         });
         const result = await response.data;
         console.log(result);
-        if (result.status == "success") {
+        if (result.status == 200) {
           alert("Thêm thành công");
         } else if (result.status != 200) {
           alert("Thêm thất bại");
