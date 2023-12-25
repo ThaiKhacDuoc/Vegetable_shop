@@ -538,7 +538,7 @@ def nhanvien_update(nhanvien_id):
         cursor.close()
         connection.close()
 
-        return jsonify({'message': 'Người dùng đã được chỉnh sửa thành công'})
+        return jsonify({'status': 200, 'message': 'Người dùng đã được chỉnh sửa thành công'})
     else:
         return jsonify({'message': 'Missing or invalid data in request'})
 
